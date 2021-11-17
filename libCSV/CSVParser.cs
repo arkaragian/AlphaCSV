@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 
 namespace libCSV {
-    public class CSVParser {
+    public static class CSVParser {
         /// <summary>
         /// Reads a CSV file with a defined schema.
         /// </summary>
@@ -40,7 +40,7 @@ namespace libCSV {
                 }
                 dataRow++;
                 //Split our fields with the delimeter.
-                string[] fields = line.Split(options.Delimeter);
+                string[] fields = ParseLine(line, options.Delimeter);
                 if (fields.Length != schema.Columns.Count) {
                     throw new InvalidOperationException($"The number of columns found in the file: {fields.Length} do not match the number of columns declared in the schema {schema.Columns.Count}. Offending row:{globalRow}");
                 }
@@ -86,6 +86,11 @@ namespace libCSV {
                 table.Rows.Add(r);
             }
             return table;
+        }
+
+        public static string[] ParseLine(string line, char delimiter) {
+            //We expect the future to be more complex. Thus we need to prepare for more complex line parsing.
+            return line.Split(delimiter);
         }
 
     }//End of CSV Class
