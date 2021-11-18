@@ -16,6 +16,15 @@ namespace libCSV {
         /// </summary>
         public char CommentCharacter { get; set; }
 
+        /// <summary>
+        /// Indicates the characted that comprises the quotes
+        /// <remarks>The character is null if we don't have quoted fields</remarks>
+        /// </summary>
+        public char? QuoteCharacter { get; set; }
+
+        /// <summary>
+        /// Indicate if the file contains headers
+        /// </summary>
         public bool ContainsHeaders { get; set; }
 
         /// <summary>
@@ -28,9 +37,19 @@ namespace libCSV {
         /// </summary>
         public bool ValidateFields { get; set; }
 
+        /// <summary>
+        /// Indicates if the file contains quoted fields.
+        /// </summary>
+        public bool QuotedFields { get; set; }
+
+
+
+
         public CSVParseOptions() {
             Delimeter = ',';
             CommentCharacter = '#';
+            QuoteCharacter = null;
+            QuotedFields = false;
             CheckHeaders = false;
             ValidateFields = false;
         }
