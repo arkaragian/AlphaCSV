@@ -40,7 +40,7 @@ namespace libCSV {
                 }
                 dataRow++;
                 //Split our fields with the delimeter.
-                string[] fields = ParseLine(line, options.Delimeter);
+                string[] fields = ParseLine(line, options);
                 if (fields.Length != schema.Columns.Count) {
                     throw new InvalidOperationException($"The number of columns found in the file: {fields.Length} do not match the number of columns declared in the schema {schema.Columns.Count}. Offending row:{globalRow}");
                 }
@@ -88,10 +88,44 @@ namespace libCSV {
             return table;
         }
 
-        public static string[] ParseLine(string line, char delimiter) {
-            //We expect the future to be more complex. Thus we need to prepare for more complex line parsing.
-            return line.Split(delimiter);
-        }
+        public static string[] ParseLine(string line, CSVParseOptions options) {
+            List<string> fields = new List<string>();
+            //This is quite a simple implementation. We iterrate through each character and assign it to a field.
 
+            bool insideField = false;
+            string currentField = "";
+            for (int i = 0; i < line.Length; i++) {
+                char c = line[i];
+                //We hit a quote. This is either the start or the end of the field
+                if (c == options.QuoteCharacter) {
+                    //If we are the start of the field then the field is either empty or null. This is a sufficient indicator if we are at the start of the field.
+                    if (string.IsNullOrEmpty(currentField)) {
+                        insideField = true;
+                    } else {
+                        insideField = false;
+                    }
+                    currentField += c;
+                    //The delimeter could be the last character of the line. Check that and add the field to the list
+                    if (i == line.Length - 1) {
+                        fields.Add(currentField);
+                    }
+                    //continue;
+                } else if (c == options.Delimeter | c == '\n') {
+                    if (insideField) {
+                        currentField += c;
+                    } else {
+                        fields.Add(currentField);
+                        currentField = "";
+                    }
+                } else {
+                    currentField += c;
+                    //This means that we are at the end of the line. Add whatever field is computed.
+                    if (i == line.Length - 1) {
+                        fields.Add(currentField);
+                    }
+                }
+            }
+            return fields.ToArray();
+        }
     }//End of CSV Class
 }//End of libCSV Namespace
