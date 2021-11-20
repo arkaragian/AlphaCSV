@@ -206,3 +206,6 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix =
 dotnet_naming_style.begins_with_i.word_separator =
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# CS8604: Possible null reference argument.
+dotnet_diagnostic.CS8604.severity = silent
