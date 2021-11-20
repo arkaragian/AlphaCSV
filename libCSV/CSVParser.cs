@@ -13,7 +13,13 @@ namespace libCSV {
         /// <remarks>This argument will only be used if the relevant flag is enabled in the parse options.</remarks>
         /// </param>
         /// <returns></returns>
-        public static DataTable ReadDefinedCSV(DataTable schema, string path, CSVParseOptions options, List<string> validationPatterns = null) {
+        public static DataTable ReadDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+            //Use the default options if the user does not provide them.
+            if(options == null) {
+                options = new CSVParseOptions();
+            }
+
+
             //TODO: Perform a check for the file size. Maybe warn the user that there might be memory issues. 
             string[] lines = System.IO.File.ReadAllLines(path);
             DataTable table = schema.Clone();
