@@ -104,7 +104,6 @@ namespace libCSV {
                     } else {
                         insideField = false;
                     }
-                    currentField += c;
                     //The delimeter could be the last character of the line. Check that and add the field to the list
                     if (i == line.Length - 1) {
                         fields.Add(currentField);

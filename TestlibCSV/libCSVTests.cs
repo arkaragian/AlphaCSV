@@ -17,15 +17,19 @@ namespace TestlibCSV {
 
 
             line = "\"Hello\",\"World\"";
-            fields = new string[] { "\"Hello\"", "\"World\"" };
+            fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
 
             line = "\"He,llo\",\"World\"";
-            fields = new string[] { "\"He,llo\"", "\"World\"" };
+            fields = new string[] { "He,llo", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"He,llo\",World";
+            fields = new string[] { "He,llo", "World" };
             yield return new object[] { line, fields, options };
 
             line = "Hello,\"World\"";
-            fields = new string[] { "Hello", "\"World\"" };
+            fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
         }
 
