@@ -37,19 +37,10 @@ namespace libCSV {
         /// </summary>
         public bool ValidateFields { get; set; }
 
-        /// <summary>
-        /// Indicates if the file contains quoted fields.
-        /// </summary>
-        public bool QuotedFields { get; set; }
-
-
-
-
         public CSVParseOptions() {
             Delimeter = ',';
             CommentCharacter = '#';
-            QuoteCharacter = null;
-            QuotedFields = false;
+            QuoteCharacter = '"';
             CheckHeaders = false;
             ValidateFields = false;
         }
