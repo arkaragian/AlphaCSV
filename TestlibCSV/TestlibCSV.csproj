@@ -18,4 +18,10 @@
     <ProjectReference Include="..\libCSV\libCSV.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestCSVFiles\Test1.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

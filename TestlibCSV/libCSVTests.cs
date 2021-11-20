@@ -2,6 +2,7 @@ using libCSV;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace TestlibCSV {
     [TestClass]
@@ -43,6 +44,22 @@ namespace TestlibCSV {
             }
             Assert.AreEqual(expectedFields.Length, fields.Length);
             CollectionAssert.AreEqual(expectedFields, fields);
+        }
+
+        [TestMethod]
+        public void TestReadCSVFile() {
+            DataTable schema = new DataTable();
+            schema.Columns.Add(new DataColumn("FieldA", typeof(string)));
+            schema.Columns.Add(new DataColumn("FieldB", typeof(string)));
+            schema.Columns.Add(new DataColumn("FieldC", typeof(string)));
+            schema.Columns.Add(new DataColumn("FieldD", typeof(string)));
+            schema.Columns.Add(new DataColumn("FieldE", typeof(string)));
+
+            DataTable table = CSVParser.ReadDefinedCSV(schema, "TestCSVFiles/Test1.csv");
+            string f1 = (string)table.Rows[0][0];
+            string f2 = (string)table.Rows[1][2];
+            Assert.AreEqual("This", f1);
+            Assert.AreEqual("Generated", f2);
         }
     }
 }
