@@ -16,15 +16,16 @@ namespace TestlibCSV {
             yield return new object[] { line, fields, options };
 
 
-            options.QuotedFields = true;
-            options.QuoteCharacter = '"';
-
             line = "\"Hello\",\"World\"";
             fields = new string[] { "\"Hello\"", "\"World\"" };
             yield return new object[] { line, fields, options };
 
             line = "\"He,llo\",\"World\"";
             fields = new string[] { "\"He,llo\"", "\"World\"" };
+            yield return new object[] { line, fields, options };
+
+            line = "Hello,\"World\"";
+            fields = new string[] { "Hello", "\"World\"" };
             yield return new object[] { line, fields, options };
         }
 
