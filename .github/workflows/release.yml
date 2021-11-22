@@ -37,11 +37,11 @@ jobs:
     - name: Restore dependencies
       run: |
         dotnet nuget add source --username arkaragian --password ${{ secrets.PATLIBCSV}} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/arkaragian/index.json"
-        dotnet restore --no-cache --verbosity normal libPTU
+        dotnet restore --no-cache --verbosity normal libCSV
 
       # Build and set the version as a build parameter using the -p MSBuild option
     - name: Build
-      run: dotnet build --no-restore --no-incremental --verbosity normal --configuration Release -p:Version=${VERSION} libPTU
+      run: dotnet build --no-restore --no-incremental --verbosity normal --configuration Release -p:Version=${VERSION} libCSV
 
       # Pack the package
     - name: Pack
