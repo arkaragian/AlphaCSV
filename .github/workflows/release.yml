@@ -1,0 +1,54 @@
+name: Release Package
+
+# When there is a push, with tags that match the expression
+# execute the job. The job assumes linux since it is easier
+# with the bash commands
+on:
+  create:
+    tags:
+    # Match an optional v prefix -> v?
+    # Match a number from 0 to 9 one or more times -> [0-9]+
+    # Match dots
+    # Match an optional group with the following format
+    #       Optional hyphen -  ->  -?
+    #       one of those three words alpha beta rc
+    #       number from 0 to 9 one or more times
+    - "v?[0-9]+.[0-9]+.[0-9]+(-?(alpha|beta|rc)[0-9]+)?"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+      # Create a VERSION variable based on the current tag.
+    - name: Set VERSION variable from tag
+      run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+
+      # This package uses dependencies from other private repos. Thus we need to add them to the sources
+      # We need to store the password in clear-text since Password encryption is not supported on .NET Core
+      # for this platform (linux)
+      #
+      # Since we need to use a package from another private repo of the same account. The GITHUB_TOKEN does not have access.
+      # We need to use a PAT that is stored in this repo as a secret.
+    - name: Restore dependencies
+      run: |
+        dotnet nuget add source --username arkaragian --password ${{ secrets.PATLIBCSV}} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/arkaragian/index.json"
+        dotnet restore --no-cache --verbosity normal libPTU
+
+      # Build and set the version as a build parameter using the -p MSBuild option
+    - name: Build
+      run: dotnet build --no-restore --no-incremental --verbosity normal --configuration Release -p:Version=${VERSION} libPTU
+
+      # Pack the package
+    - name: Pack
+      run: dotnet pack --configuration Release -p:Version=${VERSION} libCSV --no-build --output .
+      
+      # Upload the package to my repo
+    - name: Push
+      run: dotnet nuget push libCSV.${VERSION}.nupkg --source https://nuget.pkg.github.com/arkaragian/index.json --api-key ${GITHUB_TOKEN}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
