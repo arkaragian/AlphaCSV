@@ -93,6 +93,12 @@ namespace libCSV {
             return table;
         }
 
+        /// <summary>
+        /// Parses a line and returns all the fields comprising this line.
+        /// </summary>
+        /// <param name="line">The line to be parsed</param>
+        /// <param name="options">The parsing options</param>
+        /// <returns>An array containing all the seperate fields that comprise the file.</returns>
         public static string[] ParseLine(string line, CSVParseOptions options) {
             List<string> fields = new List<string>();
             //This is quite a simple implementation. We iterrate through each character and assign it to a field.
@@ -132,6 +138,10 @@ namespace libCSV {
             return fields.ToArray();
         }
 
+
+        public static DataTable ReadSchemaFromFile(string filename) {
+            throw new NotImplementedException("Not yet implemented");
+        }
 
         /// <summary>
         /// Helper function to attach data in a new InvalidOperationException
