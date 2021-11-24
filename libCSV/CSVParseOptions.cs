@@ -37,12 +37,21 @@ namespace libCSV {
         /// </summary>
         public bool ValidateFields { get; set; }
 
+        /// <summary>
+        /// Defines the format of the date time.
+        /// <remarks>
+        /// This format is empty by default.
+        /// </remarks>
+        /// </summary>
+        public string DateTimeFormat { get; set; }
+
         public CSVParseOptions() {
             Delimeter = ',';
             CommentCharacter = '#';
             QuoteCharacter = '"';
             CheckHeaders = false;
             ValidateFields = false;
+            DateTimeFormat = "";
         }
 
     }
