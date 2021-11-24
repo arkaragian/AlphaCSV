@@ -85,7 +85,20 @@ namespace libCSV {
 
                 DataRow r = table.NewRow();
                 for (int i = 0; i < table.Columns.Count; i++) {
-                    r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
+                    if (schema.Columns[i].DataType == typeof(DateTime)) {
+                        //If there are no options. Try a parsing. If there are options parse the stuff as needed.
+                        //TODO: Log this with an ILogger
+                        if (string.IsNullOrEmpty(options.DateTimeFormat)) {
+                            DateTime theDate;
+                            DateTime.TryParse(fields[i],out theDate);
+                            r[i] = theDate;
+                        } else {
+                            r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
+                        }
+                    } else {
+                        r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
+                    }
+
                 }
 
                 table.Rows.Add(r);
