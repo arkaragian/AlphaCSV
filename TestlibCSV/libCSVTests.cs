@@ -32,11 +32,20 @@ namespace TestlibCSV {
             line = "Hello,\"World\"";
             fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
+
+            line = "Hello";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\"";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
         }
 
         [DataTestMethod]
         [DynamicData(nameof(CSVLinesProvider), DynamicDataSourceType.Method)]
         public void TestLineParsing(string input, string[] expectedFields, CSVParseOptions options) {
+            Console.WriteLine($"Input {input}\n");
             string[] fields = CSVParser.ParseLine(input, options);
             foreach (string s in fields) {
                 Console.WriteLine($"Parsed {s}");
