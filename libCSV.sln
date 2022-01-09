@@ -5,7 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "libCSV", "libCSV\libCSV.csproj", "{749C67D8-6861-4F34-8DD1-172490E3AFB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestlibCSV", "TestlibCSV\TestlibCSV.csproj", "{DD671397-B6D9-4B6C-BFE7-D74ED6F075A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestlibCSV", "TestlibCSV\TestlibCSV.csproj", "{DD671397-B6D9-4B6C-BFE7-D74ED6F075A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libCSVExamples", "libCSVExamples\libCSVExamples.csproj", "{493489D3-59D6-49E8-98B0-92F5F49C089C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DD671397-B6D9-4B6C-BFE7-D74ED6F075A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD671397-B6D9-4B6C-BFE7-D74ED6F075A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD671397-B6D9-4B6C-BFE7-D74ED6F075A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{493489D3-59D6-49E8-98B0-92F5F49C089C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{493489D3-59D6-49E8-98B0-92F5F49C089C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{493489D3-59D6-49E8-98B0-92F5F49C089C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{493489D3-59D6-49E8-98B0-92F5F49C089C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
