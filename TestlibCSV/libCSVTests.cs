@@ -21,8 +21,24 @@ namespace TestlibCSV {
             string line = "Hello,World";
             string[] fields = { "Hello", "World" };
             yield return new object[] { line, fields, options };
+            
+            line = "Hello,World\n";
+            fields = new string[]{ "Hello", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "Hello,World\r\n";
+            fields = new string[]{ "Hello", "World" };
+            yield return new object[] { line, fields, options };
 
             line = "\"Hello\",\"World\"";
+            fields = new string[] { "Hello", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"World\"\n";
+            fields = new string[] { "Hello", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"World\"\r\n";
             fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
 
@@ -30,7 +46,23 @@ namespace TestlibCSV {
             fields = new string[] { "He,llo", "World" };
             yield return new object[] { line, fields, options };
 
+            line = "\"He,llo\",\"World\"\n";
+            fields = new string[] { "He,llo", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"He,llo\",\"World\"\r\n";
+            fields = new string[] { "He,llo", "World" };
+            yield return new object[] { line, fields, options };
+
             line = "\"He,llo\",World";
+            fields = new string[] { "He,llo", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"He,llo\",World\n";
+            fields = new string[] { "He,llo", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"He,llo\",World\r\n";
             fields = new string[] { "He,llo", "World" };
             yield return new object[] { line, fields, options };
 
@@ -38,11 +70,35 @@ namespace TestlibCSV {
             fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
 
+            line = "Hello,\"World\"\n";
+            fields = new string[] { "Hello", "World" };
+            yield return new object[] { line, fields, options };
+
+            line = "Hello,\"World\"\r\n";
+            fields = new string[] { "Hello", "World" };
+            yield return new object[] { line, fields, options };
+
             line = "Hello";
             fields = new string[] { "Hello" };
             yield return new object[] { line, fields, options };
 
+            line = "Hello\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "Hello\r\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
             line = "\"Hello\"";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\"\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\"\r\n";
             fields = new string[] { "Hello" };
             yield return new object[] { line, fields, options };
 
@@ -54,11 +110,19 @@ namespace TestlibCSV {
             fields = new string[] { "Hello" , ""};
             yield return new object[] { line, fields, options };
 
+            line = "Hello,\r\n";
+            fields = new string[] { "Hello" , ""};
+            yield return new object[] { line, fields, options };
+
             line = "\"Hello\",";
             fields = new string[] { "Hello" , ""};
             yield return new object[] { line, fields, options };
 
             line = "\"Hello\",\n";
+            fields = new string[] { "Hello" , ""};
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\r\n";
             fields = new string[] { "Hello" , ""};
             yield return new object[] { line, fields, options };
         }

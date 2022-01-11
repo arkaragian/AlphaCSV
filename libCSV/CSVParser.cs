@@ -157,9 +157,12 @@ namespace libCSV {
                             fields.Add(currentField);
                         }
                     }
-                } else if (c == '\n') {
-                    //We have reached the end of the line add whatever field we have to the list of fields
-                    fields.Add(currentField);
+                } else if (c == '\n' | c == '\r') {
+                    //Ommit the \r character. Do not add in the field.
+                    if (c == '\n') {
+                        //We have reached the end of the line add whatever field we have to the list of fields
+                        fields.Add(currentField);
+                    }
                 } else {
                     currentField += c;
                     //This means that we are at the end of the line Though the line is not \n terminated. Add whatever field is computed.
