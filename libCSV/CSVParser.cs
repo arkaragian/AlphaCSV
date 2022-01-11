@@ -1,4 +1,10 @@
-﻿using System.Data;
+﻿//
+// Copyright (c) Aris Karagiannidis and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+//
+
+
+using System.Data;
 using System.Text.RegularExpressions;
 
 namespace libCSV {
