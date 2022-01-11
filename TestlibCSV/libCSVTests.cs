@@ -17,17 +17,16 @@ namespace TestlibCSV {
         public static IEnumerable<object[]> CSVLinesProvider() {
             CSVParseOptions options = new CSVParseOptions();
 
-
             string line = "Hello,World";
             string[] fields = { "Hello", "World" };
             yield return new object[] { line, fields, options };
-            
+
             line = "Hello,World\n";
-            fields = new string[]{ "Hello", "World" };
+            fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
 
             line = "Hello,World\r\n";
-            fields = new string[]{ "Hello", "World" };
+            fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
 
             line = "\"Hello\",\"World\"";
@@ -103,33 +102,99 @@ namespace TestlibCSV {
             yield return new object[] { line, fields, options };
 
             line = "Hello,";
-            fields = new string[] { "Hello" , ""};
+            fields = new string[] { "Hello", "" };
             yield return new object[] { line, fields, options };
 
             line = "Hello,\n";
-            fields = new string[] { "Hello" , ""};
+            fields = new string[] { "Hello", "" };
             yield return new object[] { line, fields, options };
 
             line = "Hello,\r\n";
-            fields = new string[] { "Hello" , ""};
+            fields = new string[] { "Hello", "" };
             yield return new object[] { line, fields, options };
 
             line = "\"Hello\",";
-            fields = new string[] { "Hello" , ""};
+            fields = new string[] { "Hello", "" };
             yield return new object[] { line, fields, options };
 
             line = "\"Hello\",\n";
-            fields = new string[] { "Hello" , ""};
+            fields = new string[] { "Hello", "" };
             yield return new object[] { line, fields, options };
 
             line = "\"Hello\",\r\n";
-            fields = new string[] { "Hello" , ""};
+            fields = new string[] { "Hello", "" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"\"";
+            fields = new string[] { "Hello", "" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"\"\n";
+            fields = new string[] { "Hello", "" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"\"\r\n";
+            fields = new string[] { "Hello", "" };
             yield return new object[] { line, fields, options };
         }
 
         [DataTestMethod]
         [DynamicData(nameof(CSVLinesProvider), DynamicDataSourceType.Method)]
         public void TestLineParsing(string input, string[] expectedFields, CSVParseOptions options) {
+            Console.WriteLine($"Input {input}\n");
+            string[] fields = CSVParser.ParseLine(input, options);
+            foreach (string s in fields) {
+                Console.WriteLine($"Parsed {s}");
+
+            }
+            Assert.AreEqual(expectedFields.Length, fields.Length);
+            CollectionAssert.AreEqual(expectedFields, fields);
+        }
+
+        public static IEnumerable<object[]> CSVLineEmptyLastFieldProvider() {
+            CSVParseOptions options = new CSVParseOptions();
+            options.AllowEmptyLastField = false;
+
+            string line = "Hello,";
+            string[] fields = { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "Hello,\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "Hello,\r\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\r\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"\"";
+            fields = new string[] { "Hello", "" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"\"\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\"\"\r\n";
+            fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(CSVLineEmptyLastFieldProvider), DynamicDataSourceType.Method)]
+        public void TestEmptyLastFieldOption(string input, string[] expectedFields, CSVParseOptions options) {
             Console.WriteLine($"Input {input}\n");
             string[] fields = CSVParser.ParseLine(input, options);
             foreach (string s in fields) {

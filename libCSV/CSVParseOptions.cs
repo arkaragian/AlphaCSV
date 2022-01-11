@@ -50,6 +50,15 @@ namespace libCSV {
         /// </summary>
         public string DateTimeFormat { get; set; }
 
+        /// <summary>
+        /// Indicates wether the last field of the file lines can be empty. (eg when there is no data on the last field).
+        /// <remarks>
+        /// Some programs may not output anything if the last field that they are trying to output is empty not even an empty quote.
+        /// This however might be in conflict with the schema that is why it can controlled by this option.
+        /// </remarks>
+        /// </summary>
+        public bool AllowEmptyLastField { get; set; }
+
         public CSVParseOptions() {
             Delimeter = ',';
             CommentCharacter = '#';
@@ -57,6 +66,7 @@ namespace libCSV {
             CheckHeaders = false;
             ValidateFields = false;
             DateTimeFormat = "";
+            AllowEmptyLastField = true;
         }
 
     }

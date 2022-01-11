@@ -153,7 +153,7 @@ namespace libCSV {
                         //However if we are at the end of the line this means that the
                         //last field does not have a value thus we need to add an empty string
                         //ourselves.
-                        if (i == line.Length - 1) {
+                        if (i == line.Length - 1 && options.AllowEmptyLastField) {
                             fields.Add(currentField);
                         }
                     }
@@ -161,7 +161,13 @@ namespace libCSV {
                     //Ommit the \r character. Do not add in the field.
                     if (c == '\n') {
                         //We have reached the end of the line add whatever field we have to the list of fields
-                        fields.Add(currentField);
+                        if (string.IsNullOrEmpty(currentField)) {
+                            if (options.AllowEmptyLastField) {
+                                fields.Add(currentField);
+                            }
+                        } else {
+                            fields.Add(currentField);
+                        }
                     }
                 } else {
                     currentField += c;

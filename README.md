@@ -1,9 +1,9 @@
 # libCSV
 
-##Installation
+## Installation
 In order to use the library install the relevant nuget package.
 
-##Usage
+## Usage
 Just include the following line in the start of your program or in your global usings.
 ```csharp
 using libCSV;
@@ -39,3 +39,4 @@ of this class instance. The parameters that can be controlled are the following 
 - The `ValidateFields` indicates to the parser if it must validate the field values against a provided regular expression (Default `false`).
 - The `DateTimeFormat` indicates to the parser the format of any DateTime that may be contained in the file. (Default is `""`).
 - `ContainsHeaders` indicates if the CSV file has a header row. (Default value is `false`) note that this option is not taken into account when reading a defined CSV.
+- The `AllowEmptyLastField` Indicates wether the last field of the file lines can be empty. (eg when there is no data on the last field) Default `true`.
