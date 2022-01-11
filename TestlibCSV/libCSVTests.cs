@@ -22,7 +22,6 @@ namespace TestlibCSV {
             string[] fields = { "Hello", "World" };
             yield return new object[] { line, fields, options };
 
-
             line = "\"Hello\",\"World\"";
             fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
@@ -45,6 +44,22 @@ namespace TestlibCSV {
 
             line = "\"Hello\"";
             fields = new string[] { "Hello" };
+            yield return new object[] { line, fields, options };
+
+            line = "Hello,";
+            fields = new string[] { "Hello" , ""};
+            yield return new object[] { line, fields, options };
+
+            line = "Hello,\n";
+            fields = new string[] { "Hello" , ""};
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",";
+            fields = new string[] { "Hello" , ""};
+            yield return new object[] { line, fields, options };
+
+            line = "\"Hello\",\n";
+            fields = new string[] { "Hello" , ""};
             yield return new object[] { line, fields, options };
         }
 

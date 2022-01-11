@@ -96,7 +96,7 @@ namespace libCSV {
                         //TODO: Log this with an ILogger
                         if (string.IsNullOrEmpty(options.DateTimeFormat)) {
                             DateTime theDate;
-                            DateTime.TryParse(fields[i],out theDate);
+                            DateTime.TryParse(fields[i], out theDate);
                             r[i] = theDate;
                         } else {
                             r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
@@ -128,7 +128,9 @@ namespace libCSV {
                 char c = line[i];
                 //We hit a quote. This is either the start or the end of the field
                 if (c == options.QuoteCharacter) {
-                    //If we are the start of the field then the field is either empty or null. This is a sufficient indicator if we are at the start of the field.
+                    //If we are the start of the field then the field is either empty or null.
+                    //This is a sufficient indicator if we are at the start of the field.
+                    //Note the insideField flag is required only when we use a quote.
                     if (string.IsNullOrEmpty(currentField)) {
                         insideField = true;
                     } else {
@@ -139,16 +141,28 @@ namespace libCSV {
                         fields.Add(currentField);
                     }
                     //continue;
-                } else if (c == options.Delimeter | c == '\n') {
+                } else if (c == options.Delimeter) {
                     if (insideField) {
+                        //If the CSV is quoted. Then the delimeter we encounter here is part of the field value.
+                        //Otherwise we need to add the computed field to our list and prepare to calculate the next field.
                         currentField += c;
                     } else {
                         fields.Add(currentField);
                         currentField = "";
+                        //Now we have now reset our state and we are ready to move on.
+                        //However if we are at the end of the line this means that the
+                        //last field does not have a value thus we need to add an empty string
+                        //ourselves.
+                        if (i == line.Length - 1) {
+                            fields.Add(currentField);
+                        }
                     }
+                } else if (c == '\n') {
+                    //We have reached the end of the line add whatever field we have to the list of fields
+                    fields.Add(currentField);
                 } else {
                     currentField += c;
-                    //This means that we are at the end of the line. Add whatever field is computed.
+                    //This means that we are at the end of the line Though the line is not \n terminated. Add whatever field is computed.
                     if (i == line.Length - 1) {
                         fields.Add(currentField);
                     }
