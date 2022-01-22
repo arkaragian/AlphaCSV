@@ -8,7 +8,7 @@ using System.Data;
 using System.Text.RegularExpressions;
 
 namespace libCSV {
-    public static class CSVParser {
+    public static partial class CSVParser {
         /// <summary>
         /// Reads a CSV file with a defined schema.
         /// </summary>
