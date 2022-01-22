@@ -33,10 +33,10 @@ namespace libCSV {
             if (options.ValidateFields) {
                 if (validationPatterns != null) {
                     if (validationPatterns.Count != schema.Columns.Count) {
-                        throw GenerateInvalidOpEx("The number of validation patterns given do not match the number of columns in the file schema", options, validationPatterns);
+                        throw GenerateInvalidOpException("The number of validation patterns given do not match the number of columns in the file schema", options, validationPatterns);
                     }
                 } else {
-                    throw GenerateInvalidOpEx("Field validation was requested but no validation patterns were provided.", options, validationPatterns);
+                    throw GenerateInvalidOpException("Field validation was requested but no validation patterns were provided.", options, validationPatterns);
                 }
             }
             //Keep track of the current row for informational purposes.
@@ -54,7 +54,7 @@ namespace libCSV {
                 //Split our fields with the delimeter.
                 string[] fields = ParseLine(line, options);
                 if (fields.Length != schema.Columns.Count) {
-                    throw GenerateInvalidOpEx($"The number of columns found in the file: {fields.Length} do not match the number of columns declared in the schema {schema.Columns.Count}. Offending row:{globalRow}", options, validationPatterns);
+                    throw GenerateInvalidOpException($"The number of columns found in the file: {fields.Length} do not match the number of columns declared in the schema {schema.Columns.Count}. Offending row:{globalRow}", options, validationPatterns);
                 }
                 //If we are in the first line
                 if (dataRow == 1) {
@@ -63,7 +63,7 @@ namespace libCSV {
                         int index = 0;
                         foreach (string f in fields) {
                             if (!f.Equals(schema.Columns[index].ColumnName)) {
-                                throw GenerateInvalidOpEx("Column Names do not match. Offending names are " + f + " and " + schema.Columns[index].ColumnName, options, validationPatterns);
+                                throw GenerateInvalidOpException("Column Names do not match. Offending names are " + f + " and " + schema.Columns[index].ColumnName, options, validationPatterns);
                             }
                             index++;
                         }
@@ -73,7 +73,7 @@ namespace libCSV {
 
                 //Before trying to do any operation verify that we have the correct number of fields.
                 if (schema.Columns.Count != fields.Length) {
-                    throw GenerateInvalidOpEx($"The number of fields present in the line {fields.Length} do not match the numer of fields defined in the schema {schema.Columns.Count}. Offending row:{globalRow}", options, validationPatterns);
+                    throw GenerateInvalidOpException($"The number of fields present in the line {fields.Length} do not match the numer of fields defined in the schema {schema.Columns.Count}. Offending row:{globalRow}", options, validationPatterns);
                 }
 
                 if (options.ValidateFields) {
@@ -83,7 +83,7 @@ namespace libCSV {
                         Regex rg = new Regex(pattern);
                         Match match = rg.Match(fields[i]);
                         if (!match.Success) {
-                            throw GenerateInvalidOpEx($"Could not match the {pattern} with the field {i + 1} with field contents {fields[i]}. Offending row:{globalRow}", options, validationPatterns);
+                            throw GenerateInvalidOpException($"Could not match the {pattern} with the field {i + 1} with field contents {fields[i]}. Offending row:{globalRow}", options, validationPatterns);
                         }
                     }
                 }
@@ -192,7 +192,7 @@ namespace libCSV {
         /// <param name="options">The Parsing options</param>
         /// <param name="validationPatterns">The validation parameters</param>
         /// <returns>An exception ready to the thrown from the program</returns>
-        private static InvalidOperationException GenerateInvalidOpEx(string message, CSVParseOptions options = null, List<string> validationPatterns = null) {
+        private static InvalidOperationException GenerateInvalidOpException(string message, CSVParseOptions options = null, List<string> validationPatterns = null) {
             InvalidOperationException ex = new InvalidOperationException(message);
             if (options != null) {
                 ex.Data.Add("CSVParserOptions", options);
