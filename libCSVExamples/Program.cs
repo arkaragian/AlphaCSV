@@ -21,7 +21,7 @@ namespace libCSVExamples {
             schema.Columns.Add(new DataColumn("ColumnA", typeof(string)));
             schema.Columns.Add(new DataColumn("ColumnB", typeof(string)));
 
-            DataTable result = CSVParser.ReadDefinedCSV(schema, filename);
+            DataTable result = CSVParser.ParseDefinedCSV(schema, filename);
             return result;
         }
 

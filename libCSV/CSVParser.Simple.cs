@@ -25,7 +25,7 @@ namespace libCSV {
                 schema.Columns.Add(column);
             }
 
-            return ReadDefinedCSV(schema, path, options, null);
+            return ParseDefinedCSV(schema, path, options, null);
         }
     }
 }

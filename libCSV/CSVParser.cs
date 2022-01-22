@@ -19,7 +19,7 @@ namespace libCSV {
         /// <remarks>This argument will only be used if the relevant flag is enabled in the parse options.</remarks>
         /// </param>
         /// <returns></returns>
-        public static DataTable ReadDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+        public static DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
             //Use the default options if the user does not provide them.
             if (options == null) {
                 options = new CSVParseOptions();

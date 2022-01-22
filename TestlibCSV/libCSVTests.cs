@@ -214,7 +214,7 @@ namespace TestlibCSV {
             schema.Columns.Add(new DataColumn("FieldD", typeof(string)));
             schema.Columns.Add(new DataColumn("FieldE", typeof(string)));
 
-            DataTable table = CSVParser.ReadDefinedCSV(schema, "TestCSVFiles/Test1.csv");
+            DataTable table = CSVParser.ParseDefinedCSV(schema, "TestCSVFiles/Test1.csv");
             string f1 = (string)table.Rows[0][0];
             string f2 = (string)table.Rows[1][2];
             Assert.AreEqual("This", f1);
