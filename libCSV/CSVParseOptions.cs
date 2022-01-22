@@ -3,12 +3,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace libCSV {
     public class CSVParseOptions {
         /// <summary>

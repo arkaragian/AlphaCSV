@@ -127,6 +127,7 @@ namespace libCSV {
         /// <param name="line">The line to be parsed</param>
         /// <param name="options">The parsing options</param>
         /// <returns>An array containing all the seperate fields that comprise the file.</returns>
+        //TODO: Make this method non static and private. This need refactoring to the unit tests. 
         public static string[] ParseLine(string line, CSVParseOptions options) {
             List<string> fields = new List<string>();
             //This is quite a simple implementation. We iterrate through each character and assign it to a field.
