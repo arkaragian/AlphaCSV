@@ -2,13 +2,22 @@
 // Copyright (c) Aris Karagiannidis and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
-
-
 using System.Data;
 using System.Text.RegularExpressions;
+using System.IO.Abstractions;
 
 namespace libCSV {
-    public static partial class CSVParser {
+    public partial class CSVParser {
+
+        readonly IFileSystem FSInterface;
+
+        public CSVParser(IFileSystem fileSystem) {
+            this.FSInterface = fileSystem;
+        }
+
+        public CSVParser() : this(new FileSystem()) {
+        }
+
         /// <summary>
         /// Reads a CSV file with a defined schema.
         /// </summary>
@@ -19,7 +28,7 @@ namespace libCSV {
         /// <remarks>This argument will only be used if the relevant flag is enabled in the parse options.</remarks>
         /// </param>
         /// <returns></returns>
-        public static DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+        public DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
             //Use the default options if the user does not provide them.
             if (options == null) {
                 options = new CSVParseOptions();
@@ -27,7 +36,7 @@ namespace libCSV {
 
 
             //TODO: Perform a check for the file size. Maybe warn the user that there might be memory issues. 
-            string[] lines = System.IO.File.ReadAllLines(path);
+            string[] lines = FSInterface.File.ReadAllLines(path);
             DataTable table = schema.Clone();
 
             if (options.ValidateFields) {

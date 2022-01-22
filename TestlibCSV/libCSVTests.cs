@@ -17,6 +17,16 @@ namespace TestlibCSV {
         public static IEnumerable<object[]> CSVLinesProvider() {
             CSVParseOptions options = new CSVParseOptions();
 
+            //The line comprises of three modes.
+            //Simple Field delimitation
+            //Simple filed delimitation with newline
+            //Simple filed delimitation with CR and Newline
+
+            //Quoted fields (QF)
+            //QF with new line
+            //QF with CR and Newline
+
+
             string line = "Hello,World";
             string[] fields = { "Hello", "World" };
             yield return new object[] { line, fields, options };
@@ -214,7 +224,9 @@ namespace TestlibCSV {
             schema.Columns.Add(new DataColumn("FieldD", typeof(string)));
             schema.Columns.Add(new DataColumn("FieldE", typeof(string)));
 
-            DataTable table = CSVParser.ParseDefinedCSV(schema, "TestCSVFiles/Test1.csv");
+            CSVParser Parser = new CSVParser();
+
+            DataTable table = Parser.ParseDefinedCSV(schema, "TestCSVFiles/Test1.csv");
             string f1 = (string)table.Rows[0][0];
             string f2 = (string)table.Rows[1][2];
             Assert.AreEqual("This", f1);

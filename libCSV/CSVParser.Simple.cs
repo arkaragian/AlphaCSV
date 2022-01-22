@@ -6,16 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace libCSV {
-    public static partial class CSVParser {
+    public partial class CSVParser {
 
 
-        public static DataTable ParseSimpleCSV(string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+        public DataTable ParseSimpleCSV(string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
             //Before we continue we need to make some assumptions for the file. e.g to know how many fields we need to parse.
             //Thus we read only the first line, deduce information there and try to move forward.
 
             //File.ReadLines makes use of lazy evaluation and doesn't read the whole file into an array of lines first.
             //https://stackoverflow.com/questions/27345854/read-only-first-line-from-a-text-file/27345927
-            string FirstLine = File.ReadLines(path).First();
+            string FirstLine = FSInterface.File.ReadLines(path).First();
 
             if (options == null) {
                 options = new CSVParseOptions();
