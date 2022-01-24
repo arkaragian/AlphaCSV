@@ -22,12 +22,6 @@ namespace TestlibCSV {
             //Simple filed delimitation with newline
             //Simple filed delimitation with CR and Newline
 
-            //Quoted fields (QF)
-            //QF with new line
-            //QF with CR and Newline
-
-            //Mix of quoted and unquoted fields
-
             string line;
             string[] fields;
 
@@ -56,7 +50,7 @@ namespace TestlibCSV {
             yield return new object[] { line, fields, options };
 
             line = "Hello,World";
-            fields = new string[]{ "Hello", "World" };
+            fields = new string[] { "Hello", "World" };
             yield return new object[] { line, fields, options };
 
             line = "Hello,World\n";
@@ -71,6 +65,10 @@ namespace TestlibCSV {
 
         public static IEnumerable<object[]> QuotedFields() {
             CSVParseOptions options = new CSVParseOptions();
+
+            //Quoted fields (QF)
+            //QF with new line
+            //QF with CR and Newline
 
             string line;
             string[] fields;
