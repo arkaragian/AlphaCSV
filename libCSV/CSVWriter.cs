@@ -30,7 +30,7 @@ namespace libCSV {
                 }
 
                 foreach (char c in colName) {
-                    if (c == options.QuoteCharacter) {
+                    if (c == options.QuoteCharacter && quoted) {
                         //TODO: Decide if I want to escape the character
                         throw new InvalidOperationException($"Field cannot contain the quote character {c}");
                     }
@@ -69,7 +69,7 @@ namespace libCSV {
                     }
 
                     foreach (char c in field) {
-                        if (c == options.QuoteCharacter) {
+                        if (c == options.QuoteCharacter && quoted) {
                             //TODO: Decide if I want to escape the character
                             throw new InvalidOperationException($"Field cannot contain the quote character {c}");
                         }
