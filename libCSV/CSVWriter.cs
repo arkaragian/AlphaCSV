@@ -15,7 +15,7 @@ namespace libCSV {
         }
 
         public void WriteCSV(string filename, DataTable data, CSVParseOptions options = null) {
-            if(options == null) {
+            if (options == null) {
                 options = new CSVParseOptions();
             }
 
@@ -92,10 +92,15 @@ namespace libCSV {
                 sb.Clear();
             }
 
+            //Since we are using a stream we must first delete the file. If the file exists and the contents that we need to write are
+            //fewer then the resuling file will the the contents that we wrote plus the previous contents that we did not override.
+            if (File.Exists(filename)) {
+                File.Delete(filename);
+            }
             FileStream fileStream = File.OpenWrite(filename);
             StreamWriter writer = new StreamWriter(fileStream);
             writer.Write(header);
-            for(int i=0; i<lines.Count; i++) {
+            for (int i = 0; i < lines.Count; i++) {
                 writer.Write(lines[i]);
             }
             writer.Flush();
