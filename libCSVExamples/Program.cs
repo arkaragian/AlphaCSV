@@ -14,6 +14,8 @@ namespace libCSVExamples {
             DataTable simple = ReadSimpleCSV("SampleCSV/TwoColumnCSV.csv");
 
             PrintDataTable(simple);
+
+            WriteToCSV();
         }
 
         public static DataTable ReadSimpleCSV(string filename) {
@@ -40,6 +42,27 @@ namespace libCSVExamples {
                 }
                 Console.Write("\n");
             }
+        }
+
+        public static void WriteToCSV() {
+            DataTable table = new DataTable();
+            table.Columns.Add(new DataColumn("Hello",typeof(string)));
+            table.Columns.Add(new DataColumn("Value",typeof(int)));
+
+            DataRow r = table.NewRow();
+            r[0] = "Aris";
+            r[1] = 20;
+            
+            table.Rows.Add(r);
+
+            r = table.NewRow();
+            r[0] = "Test";
+            r[1] = 25;
+
+            table.Rows.Add(r);
+
+            CSVWriter writer = new CSVWriter();
+            writer.WriteCSV("WriteTest.csv", table);
         }
     }
 }
