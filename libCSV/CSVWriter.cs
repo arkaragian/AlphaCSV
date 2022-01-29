@@ -111,10 +111,10 @@ namespace libCSV {
 
             //Since we are using a stream we must first delete the file. If the file exists and the contents that we need to write are
             //fewer then the resuling file will the the contents that we wrote plus the previous contents that we did not override.
-            if (File.Exists(filename)) {
-                File.Delete(filename);
+            if (FSInterface.File.Exists(filename)) {
+                FSInterface.File.Delete(filename);
             }
-            FileStream fileStream = File.OpenWrite(filename);
+            Stream fileStream = FSInterface.File.OpenWrite(filename);
             StreamWriter writer = new StreamWriter(fileStream);
             writer.Write(header);
             for (int i = 0; i < lines.Count; i++) {
