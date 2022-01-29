@@ -3,17 +3,34 @@ using System.IO.Abstractions;
 using System.Text;
 
 namespace libCSV {
+    /// <summary>
+    /// A class that writes a CSV file to disk
+    /// </summary>
     public class CSVWriter {
 
         readonly IFileSystem FSInterface;
 
+        /// <summary>
+        /// Constructor for dependency injection
+        /// </summary>
+        /// <param name="fileSystem"></param>
         public CSVWriter(IFileSystem fileSystem) {
             this.FSInterface = fileSystem;
         }
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public CSVWriter() : this(new FileSystem()) {
         }
 
+        /// <summary>
+        /// Writes a datatable to a CSV file.
+        /// </summary>
+        /// <param name="filename">The file where the csv data will be written to</param>
+        /// <param name="data">The data to write</param>
+        /// <param name="options">CSV Parsing options</param>
+        /// <exception cref="InvalidOperationException"></exception>
         public void WriteCSV(string filename, DataTable data, CSVParseOptions options = null) {
             if (options == null) {
                 options = new CSVParseOptions();

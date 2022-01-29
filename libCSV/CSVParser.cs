@@ -7,27 +7,37 @@ using System.Text.RegularExpressions;
 using System.IO.Abstractions;
 
 namespace libCSV {
+    /// <summary>
+    /// This is the primary class that is used in order to parse a CSV file.
+    /// </summary>
     public partial class CSVParser {
 
         readonly IFileSystem FSInterface;
 
+        /// <summary>
+        /// Constructor with dependency injectio using file system abstractions.
+        /// </summary>
+        /// <param name="fileSystem"></param>
         public CSVParser(IFileSystem fileSystem) {
             this.FSInterface = fileSystem;
         }
 
+        /// <summary>
+        /// The default constructor
+        /// </summary>
         public CSVParser() : this(new FileSystem()) {
         }
 
         /// <summary>
-        /// Reads a CSV file with a defined schema.
+        /// Parses a CSV file with a defined schema.
         /// </summary>
         /// <param name="schema">An empty datatable that defines the schema of the file</param>
         /// <param name="path">The path to the file that will be loaded.</param>
-        /// <param name="options">The user configurable options that define the behavior of the parser</param>
+        /// <param name="options">(Optional Parameter)The user configurable options that define the behavior of the parser</param>
         /// <param name="validationPatterns">(Optinal Parameter)A list of regular expressions that the fields of the file will be validated against.
         /// <remarks>This argument will only be used if the relevant flag is enabled in the parse options.</remarks>
         /// </param>
-        /// <returns></returns>
+        /// <returns>The contents of the CSV file inside a datatable</returns>
         public DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
             //Use the default options if the user does not provide them.
             if (options == null) {
@@ -196,7 +206,7 @@ namespace libCSV {
         }
 
         /// <summary>
-        /// Helper function to attach data in a new InvalidOperationException
+        /// Helper function to create an invalid operation exception and attach data to that exception
         /// </summary>
         /// <param name="message">The message of the Exception</param>
         /// <param name="options">The Parsing options</param>

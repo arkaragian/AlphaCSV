@@ -8,6 +8,14 @@ namespace libCSV {
     public partial class CSVParser {
 
 
+        /// <summary>
+        /// Parses a CSV file without a given schema.
+        /// <remarks>This method will assume that all the fields are of string type.</remarks>
+        /// </summary>
+        /// <param name="path">The path of the file that will be read</param>
+        /// <param name="options">(Optional argument) The options of the file that will be read.</param>
+        /// <param name="validationPatterns">(Optional Argument) Validation patterns in terms of regular expressions</param>
+        /// <returns>The contents of a CSV file in the form of a datatable</returns>
         public DataTable ParseSimpleCSV(string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
             //Before we continue we need to make some assumptions for the file. e.g to know how many fields we need to parse.
             //Thus we read only the first line, deduce information there and try to move forward.
