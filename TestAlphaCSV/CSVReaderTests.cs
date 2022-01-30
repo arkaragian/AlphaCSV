@@ -142,22 +142,23 @@ namespace TestAlphaCSV {
          * Combinations. Those in turn are yield returned to the tests.
          */
 
-
         /// <summary>
-        /// An IEnumerable method that creates all the possible input combinations for the records described in the Mehtod name. It returns
+        /// An IEnumerable method that creates all the possible input record combinations for the records described in the Mehtod parameter. It returns
         ///     <list type="number">
         ///         <item>
         ///             The contents of the CSV file
         ///         </item>
         ///         <item>
-        ///             The expected datatable
+        ///             The expected datatable to test the assertion
         ///         </item>
         ///         <item>
         ///             The CSVParse options
         ///         </item>
         ///     </list>
         /// </summary>
-        public static IEnumerable<object[]> SimpleInputGenerator() {
+        /// <param name="Method">The method that returns the required fields</param>
+        /// <returns></returns>
+        private static IEnumerable<object[]> InputGenerator(IEnumerable<object[]> Method) {
             CSVParseOptions options = new CSVParseOptions();
 
             //Create a template for generic columns that will be used to generate the datatable
@@ -172,7 +173,7 @@ namespace TestAlphaCSV {
             };
 
             StringBuilder fileBuilder = new StringBuilder();
-            foreach (object[] data in SimpleFields()) {
+            foreach (object[] data in Method) {
                 foreach (string headerTermination in HeaderTermination()) {
                     foreach (string termination in LineTermination()) {
                         fileBuilder.Clear();
@@ -213,121 +214,25 @@ namespace TestAlphaCSV {
             }
         }
 
-        /// <summary>
-        /// <inheritdoc cref="SimpleInputGenerator()"/>
-        /// </summary>
-        /// <returns></returns>
+
+        public static IEnumerable<object[]> SimpleInputGenerator() {
+            IEnumerable<object[]> tests = InputGenerator(SimpleFields());
+            foreach (object[] testCase in tests) {
+                yield return testCase;
+            }
+        }
+
         public static IEnumerable<object[]> QuotedInputGenerator() {
-            CSVParseOptions options = new CSVParseOptions();
-
-            Dictionary<int, string> headerDictionary = new Dictionary<int, string>() {
-                {1,"ColumnA" },
-                {2,"ColumnA,ColumnB" },
-            };
-
-            Dictionary<int, string[]> ExpectedHeaderFields = new Dictionary<int, string[]>() {
-                {1,new string[]{"ColumnA"}},
-                {2,new string[]{"ColumnA", "ColumnB"}},
-            };
-
-            StringBuilder fileBuilder = new StringBuilder();
-            foreach (object[] data in QuotedFields()) {
-                foreach (string headerTermination in HeaderTermination()) {
-                    foreach (string termination in LineTermination()) {
-                        fileBuilder.Clear();
-                        int numberOfFields = ((string[])data[1]).Length; //Add the header
-                        //For number of expected fields. Build a CSV input file.
-                        fileBuilder.Append(headerDictionary[numberOfFields]); //Add the header
-                        fileBuilder.Append(headerTermination);
-                        fileBuilder.Append((string)data[0]); //Add the fields line
-                        if (termination is not null) {
-                            fileBuilder.Append(termination); //Add line termination
-                        }
-
-                        DataTable expectedResult = new DataTable();
-                        string[] headers = ExpectedHeaderFields[numberOfFields];
-                        foreach (string s in headers) {
-                            expectedResult.Columns.Add(s, typeof(string));
-                        }
-
-                        DataRow r = expectedResult.NewRow();
-                        for (int i = 0; i < numberOfFields; i++) {
-                            r[i] = ((string[])data[1])[i];
-                        }
-
-                        expectedResult.Rows.Add(r);
-
-                        TerminationType headTerm = terminationLUT[headerTermination];
-                        TerminationType lineTerm;
-                        if (termination is null) {
-                            lineTerm = TerminationType.None;
-                        } else {
-                            lineTerm = terminationLUT[termination];
-                        }
-
-                        //We return the file input. The expected headers, the expected fields, and the parse options
-                        yield return new object[] { fileBuilder.ToString(), expectedResult, options, headTerm, lineTerm };
-                    }
-                }
+            IEnumerable<object[]> tests = InputGenerator(QuotedFields());
+            foreach (object[] testCase in tests) {
+                yield return testCase;
             }
         }
 
-        /// <summary>
-        /// <inheritdoc cref="SimpleInputGenerator()"/>
-        /// </summary>
-        /// <returns></returns>
         public static IEnumerable<object[]> QuotedSimpleMixInputGenerator() {
-            CSVParseOptions options = new CSVParseOptions();
-
-            Dictionary<int, string> headerDictionary = new Dictionary<int, string>() {
-                {1,"ColumnA" },
-                {2,"ColumnA,ColumnB" },
-            };
-
-            Dictionary<int, string[]> ExpectedHeaderFields = new Dictionary<int, string[]>() {
-                {1,new string[]{"ColumnA"}},
-                {2,new string[]{"ColumnA", "ColumnB"}},
-            };
-
-            StringBuilder fileBuilder = new StringBuilder();
-            foreach (object[] data in QuotedSimpleFieldMix()) {
-                foreach (string headerTermination in HeaderTermination()) {
-                    foreach (string termination in LineTermination()) {
-                        fileBuilder.Clear();
-                        int numberOfFields = ((string[])data[1]).Length; //Add the header
-                        //For number of expected fields. Build a CSV input file.
-                        fileBuilder.Append(headerDictionary[numberOfFields]); //Add the header
-                        fileBuilder.Append(headerTermination);
-                        fileBuilder.Append((string)data[0]); //Add the fields line
-                        if (termination is not null) {
-                            fileBuilder.Append(termination); //Add line termination
-                        }
-
-                        DataTable expectedResult = new DataTable();
-                        string[] headers = ExpectedHeaderFields[numberOfFields];
-                        foreach (string s in headers) {
-                            expectedResult.Columns.Add(s, typeof(string));
-                        }
-
-                        DataRow r = expectedResult.NewRow();
-                        for (int i = 0; i < numberOfFields; i++) {
-                            r[i] = ((string[])data[1])[i];
-                        }
-
-                        expectedResult.Rows.Add(r);
-
-                        TerminationType headTerm = terminationLUT[headerTermination];
-                        TerminationType lineTerm;
-                        if (termination is null) {
-                            lineTerm = TerminationType.None;
-                        } else {
-                            lineTerm = terminationLUT[termination];
-                        }
-
-                        //We return the file input. The expected headers, the expected fields, and the parse options
-                        yield return new object[] { fileBuilder.ToString(), expectedResult, options, headTerm, lineTerm };
-                    }
-                }
+            IEnumerable<object[]> tests = InputGenerator(QuotedSimpleFieldMix());
+            foreach (object[] testCase in tests) {
+                yield return testCase;
             }
         }
         #endregion
