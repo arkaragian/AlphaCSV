@@ -163,6 +163,15 @@ namespace AlphaCSV {
             return table;
         }
 
+        /// <summary>
+        /// Parses a CSV file containing values for the public set properties of the specified type
+        /// </summary>
+        /// <typeparam name="T">The type that we will receive</typeparam>
+        /// <param name="path">The path of the CSV File</param>
+        /// <param name="options">CSV Parsing options</param>
+        /// <param name="validationPatterns">Validation Patterns</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public List<T> ParseType<T>(string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
             Type genType = typeof(T);
             ConstructorInfo constructor = genType.GetConstructor(new Type[] { });
@@ -185,18 +194,26 @@ namespace AlphaCSV {
                 }
             }
 
-            DataTable schema = new DataTable();
-            for (int i = 0; i < propertNames.Count; i++) {
-                schema.Columns.Add(new DataColumn(propertNames[i], propertyTypes[i]));
-            }
+            DataTable table = ParseSimpleCSV(path, options, validationPatterns);
 
-            DataTable table = ParseDefinedCSV(schema, path, options, validationPatterns);
+            if (table.Columns.Count != propertyTypes.Count) {
+                throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyTypes.Count}");
+            }
 
             List<T> result = new List<T>(table.Rows.Count);
             foreach (DataRow row in table.Rows) {
                 object GenericInstance = constructor.Invoke(null);
-                for (int i = 0; i < propertySetMethods.Count; i++) {
-                    propertySetMethods[i].Invoke(GenericInstance, new object[] { row[i] });
+                for (int i = 0; i < table.Columns.Count; i++) {
+                    string name = table.Columns[i].ColumnName;
+                    //We cannot be sure that the CSV field order is correct especially when dealing with derived classes.
+                    //Thus we need to read the file first and then correlate the column name to the field of the class that we
+                    //need to instantiate.
+                    int indexToUse = propertNames.IndexOf(name);
+                    if (indexToUse == -1) {
+                        throw new InvalidOperationException($"There is no property with name {name}");
+                    }
+                    object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse]);
+                    propertySetMethods[indexToUse].Invoke(GenericInstance, new object[] { covertedValue });
                 }
                 result.Add((T)GenericInstance);
             }
