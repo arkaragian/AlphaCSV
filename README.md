@@ -16,7 +16,7 @@ This library is released as is and is still in <b>ALPHA</b> state. I am not repo
 for any issues or possible data loss that may occur with the use of this library.
 
 ## Installation
-In order to use the library install the relevant nuget package.
+In order to use the library just install the nuget package from nuget.org.
 
 ## Usage
 Just include the following line in the start of your program or in your global usings.
