@@ -5,9 +5,9 @@
 using System.Data;
 using System.Text.RegularExpressions;
 using System.IO.Abstractions;
-using libCSV.Interfaces;
+using AlphaCSV.Interfaces;
 
-namespace libCSV {
+namespace AlphaCSV {
     /// <summary>
     /// This is the primary class that is used in order to parse a CSV file.
     /// </summary>

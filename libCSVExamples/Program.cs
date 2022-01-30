@@ -3,13 +3,13 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 
-using libCSV;
+using AlphaCSV;
 using System.Data;
 
 namespace libCSVExamples {
     internal class Program {
         static void Main(string[] args) {
-            Console.WriteLine("Welcome to libCSVExamples. Those examples showcase the use of the library.");
+            Console.WriteLine("Welcome to AlphaCSV examples. Those examples showcase the use of the library.");
 
             DataTable simple = ReadSimpleCSV("SampleCSV/TwoColumnCSV.csv");
 

@@ -1,9 +1,9 @@
-﻿using libCSV.Interfaces;
+﻿using AlphaCSV.Interfaces;
 using System.Data;
 using System.IO.Abstractions;
 using System.Text;
 
-namespace libCSV {
+namespace AlphaCSV {
     /// <summary>
     /// A class that writes a CSV file to disk
     /// </summary>

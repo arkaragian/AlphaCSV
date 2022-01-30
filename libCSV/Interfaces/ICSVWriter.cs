@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace libCSV.Interfaces {
+namespace AlphaCSV.Interfaces {
     public interface ICSVWriter {
         public void WriteCSV(string filename, DataTable data, CSVParseOptions options = null) {
         }

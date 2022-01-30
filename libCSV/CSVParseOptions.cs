@@ -3,7 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 
-namespace libCSV {
+namespace AlphaCSV {
     public class CSVParseOptions {
         /// <summary>
         /// The delimeter that will be used in the CSV file.
