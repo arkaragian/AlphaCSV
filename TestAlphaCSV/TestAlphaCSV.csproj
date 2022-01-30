@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\libCSV\AlphaCSV.csproj" />
+    <ProjectReference Include="..\AlphaCSV\AlphaCSV.csproj" />
   </ItemGroup>
 
   <ItemGroup>

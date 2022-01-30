@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaCSV", "libCSV\AlphaCSV.csproj", "{749C67D8-6861-4F34-8DD1-172490E3AFB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaCSV", "AlphaCSV\AlphaCSV.csproj", "{749C67D8-6861-4F34-8DD1-172490E3AFB3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestlibCSV", "TestlibCSV\TestlibCSV.csproj", "{DD671397-B6D9-4B6C-BFE7-D74ED6F075A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAlphaCSV", "TestAlphaCSV\TestAlphaCSV.csproj", "{DD671397-B6D9-4B6C-BFE7-D74ED6F075A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "libCSVExamples", "libCSVExamples\libCSVExamples.csproj", "{493489D3-59D6-49E8-98B0-92F5F49C089C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaCSVExamples", "AlphaCSVExamples\AlphaCSVExamples.csproj", "{493489D3-59D6-49E8-98B0-92F5F49C089C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D36FF74-5B60-41AD-B783-F6B26D3D945B}"
 	ProjectSection(SolutionItems) = preProject
