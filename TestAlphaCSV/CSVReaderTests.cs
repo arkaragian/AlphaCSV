@@ -19,7 +19,7 @@ namespace TestAlphaCSV {
     /// whose combinations generate a multitude of inputs towards the test methods.
     /// </summary>
     [TestClass]
-    public class CSVReaderTests {
+    public partial class CSVReaderTests {
 
         #region Termination Definitions
         /// <summary>

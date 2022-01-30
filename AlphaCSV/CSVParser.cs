@@ -6,6 +6,7 @@ using System.Data;
 using System.Text.RegularExpressions;
 using System.IO.Abstractions;
 using AlphaCSV.Interfaces;
+using System.Reflection;
 
 namespace AlphaCSV {
     /// <summary>
@@ -160,6 +161,48 @@ namespace AlphaCSV {
                 table.Rows.Add(r);
             }
             return table;
+        }
+
+        public List<T> ParseType<T>(string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+            Type genType = typeof(T);
+            ConstructorInfo constructor = genType.GetConstructor(new Type[] { });
+            PropertyInfo[] properties = genType.GetProperties();
+
+
+            List<Type> propertyTypes = new List<Type>();
+            List<MethodInfo> propertySetMethods = new List<MethodInfo>();
+            List<string> propertNames = new List<string>();
+
+            List<Tuple<Type, MethodInfo>> comprisingTypes = new List<Tuple<Type, MethodInfo>>();
+            foreach (PropertyInfo pi in properties) {
+                if (pi.CanWrite) {
+                    MethodInfo? info = pi.GetSetMethod();
+                    if (info is not null) {
+                        propertyTypes.Add(pi.PropertyType);
+                        propertySetMethods.Add(pi.GetSetMethod());
+                        propertNames.Add(pi.Name);
+                    }
+                }
+            }
+
+            DataTable schema = new DataTable();
+            for (int i = 0; i < propertNames.Count; i++) {
+                schema.Columns.Add(new DataColumn(propertNames[i], propertyTypes[i]));
+            }
+
+            DataTable table = ParseDefinedCSV(schema, path, options, validationPatterns);
+
+            List<T> result = new List<T>(table.Rows.Count);
+            foreach (DataRow row in table.Rows) {
+                object GenericInstance = constructor.Invoke(null);
+                for (int i = 0; i < propertySetMethods.Count; i++) {
+                    propertySetMethods[i].Invoke(GenericInstance, new object[] { row[i] });
+                }
+                result.Add((T)GenericInstance);
+            }
+
+            return result;
+
         }
 
         /// <summary>
