@@ -1,4 +1,4 @@
-# libCSV
+# AlphaCSV
 
 ## Installation
 In order to use the library install the relevant nuget package.
@@ -6,7 +6,7 @@ In order to use the library install the relevant nuget package.
 ## Usage
 Just include the following line in the start of your program or in your global usings.
 ```csharp
-using libCSV;
+using AlphaCSV;
 ```
 
 ### Parsing of a simple file
@@ -24,14 +24,17 @@ DataTable schema = new DataTable();
 schema.Columns.Add(new DataColumn("ColumnA", typeof(string)));
 schema.Columns.Add(new DataColumn("ColumnB", typeof(string)));
 
-DataTable result = CSVParser.ReadDefinedCSV(schema, filename);
+CSVParser parser = new CSVParser();
+
+DataTable result = parser.ParseDefinedCSV(schema, filename);
 ```
 The CSV file is then parsed into a datatable. Note that the schema of the file
 has to be defined, both in terms of column names and also in terms of `type`.
 
 ## The `CSVParseOptions` Class
-This class controls the behavior of the csv parser. The options can be set through the public properies
-of this class instance. The parameters that can be controlled are the following :
+This class controls the behavior of the csv parser and may be passed to the parser method as an optional argument.
+
+The options can be set through the public properies of the class. The parameters that can be controlled are the following :
 - The `Delimeter`. This is the character that seperates the fields within the file. (Default value of `,`).
 - The `CommentCharacter`. Every line that starts with this character is ignored. (Default value of `#`).
 - The `QuoteCharacter`. This is the character that escapes a field if that field contains the `Delimerer` character.
