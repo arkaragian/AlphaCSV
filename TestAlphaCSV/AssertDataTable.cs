@@ -19,17 +19,17 @@ namespace TestAlphaCSV {
                     //Check that the column types are the same
                     for (int i = 0; i < expected.Columns.Count; i++) {
                         if (expected.Columns[i].DataType != actual.Columns[i].DataType) {
-                            throw new Exception("The type of of columns is not the same in both tables!");
+                            throw new Exception($"The type of of columns is not the same in both tables! Expected:{expected.Columns[i].DataType} Actual:{actual.Columns[i].DataType} for index {i}");
                         }
                     }
                     //Check that the headers are the same
                     for (int i = 0; i < expected.Columns.Count; i++) {
                         if (expected.Columns[i].ColumnName != actual.Columns[i].ColumnName) {
-                            throw new Exception("Column names do not match!");
+                            throw new Exception($"Column names do not match! Expected:{expected.Columns[i].ColumnName} Actual:{actual.Columns[i].ColumnName} for index {i}");
                         }
                     }
                 } else {
-                    throw new Exception("Tables do not have the same number of columnt");
+                    throw new Exception("Tables do not have the same number of columns");
                 }
 
                 //Up to this point we have verified the columns. Now we are going th verify the rows
@@ -37,7 +37,7 @@ namespace TestAlphaCSV {
                     for (int i = 0; i < expected.Columns.Count; i++) {
                         for (int j = 0; j < expected.Rows.Count; j++) {
                             if (!expected.Rows[j][i].Equals(actual.Rows[j][i])) {
-                                throw new Exception("Cells are not equal!");
+                                throw new Exception($"Cells are not equal! In Row {j} and Column {i} Expected {expected.Rows[j][i]} Actual {actual.Rows[j][i]}");
                             }
                         }
                     }
@@ -46,7 +46,13 @@ namespace TestAlphaCSV {
                     return;
                 }
             } else {
-                throw new Exception("One table is null and the other is not!");
+                if (expected == null) {
+                    throw new Exception("Expected table is null!");
+                }
+
+                if (actual == null) {
+                    throw new Exception("Actual table is null!");
+                }
             }
         } //End of Compare Data Datables
     } //End of class
