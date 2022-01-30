@@ -6,10 +6,14 @@ be used in larger projects.
 The library imports the CSV into a datatable. The columns of the datatable can have
 multiple types which can be described in a datatable schema.
 
-This library can also parse CSV files into lists of classes or recrods provided that:
+This library can also parse CSV files into lists of classes or records provided that:
 
 1) They provide public parameterless constructors
-2) Hve public set properties
+2) Have public set properties
+
+## Before Proceeding
+This library is released as is and is still in <b>ALPHA</b> state. I am not reponsible
+for any issues or possible data loss that may occur with the use of this library.
 
 ## Installation
 In order to use the library install the relevant nuget package.
@@ -61,7 +65,7 @@ DataTable result = parser.ParseDefinedCSV(schema, filename);
 The CSV file is then parsed into a datatable. Note that the schema of the file
 has to be defined, both in terms of column names and also in terms of `type`.
 
-### Parsing custom types with the `ParseType` method.
+### Parsing custom types with the `ParseType<T>` method.
 If you have custom types then those could be parsed as the following example:
 For a record
 ```csharp
@@ -87,7 +91,6 @@ Surname,Name
 Doe,John
 Doe,Jane
 ```
-
 
 ## The `CSVParseOptions` Class
 This class controls the behavior of the csv parser and may be passed to the parser method as an optional argument.
