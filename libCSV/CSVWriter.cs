@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using libCSV.Interfaces;
+using System.Data;
 using System.IO.Abstractions;
 using System.Text;
 
@@ -6,7 +7,7 @@ namespace libCSV {
     /// <summary>
     /// A class that writes a CSV file to disk
     /// </summary>
-    public class CSVWriter {
+    public class CSVWriter : ICSVWriter {
 
         readonly IFileSystem FSInterface;
 
