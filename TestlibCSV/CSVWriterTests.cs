@@ -1,12 +1,14 @@
-﻿using libCSV;
+﻿//
+// Copyright (c) Aris Karagiannidis and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+//
+
+using libCSV;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TestlibCSV {
     [TestClass]

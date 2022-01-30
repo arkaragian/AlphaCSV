@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+//
+// Copyright (c) Aris Karagiannidis and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+//
+
+using System;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestlibCSV {
     public static class AssertDataTable {

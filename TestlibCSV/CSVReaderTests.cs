@@ -19,7 +19,7 @@ namespace TestlibCSV {
     /// whose combinations generate a multitude of inputs towards the test methods.
     /// </summary>
     [TestClass]
-    public class libCSVTests {
+    public class CSVReaderTests {
 
         #region Termination Definitions
         /// <summary>
