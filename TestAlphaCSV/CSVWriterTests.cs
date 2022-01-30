@@ -10,7 +10,7 @@ using System.Data;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 
-namespace TestlibCSV {
+namespace TestAlphaCSV {
     [TestClass]
     public class CSVWriterTests {
 

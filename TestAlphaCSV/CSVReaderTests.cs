@@ -12,7 +12,7 @@ using System.Data;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 
-namespace TestlibCSV {
+namespace TestAlphaCSV {
     /// <summary>
     /// This class performs basic testing of the functionality of the parser.
     /// To do this we have implemented a hierarchy of IEnumerable methods

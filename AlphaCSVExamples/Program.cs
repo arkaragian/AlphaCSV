@@ -6,7 +6,7 @@
 using AlphaCSV;
 using System.Data;
 
-namespace libCSVExamples {
+namespace AlphaCSVExamples {
     internal class Program {
         static void Main(string[] args) {
             Console.WriteLine("Welcome to AlphaCSV examples. Those examples showcase the use of the library.");

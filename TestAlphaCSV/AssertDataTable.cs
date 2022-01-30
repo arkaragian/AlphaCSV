@@ -7,7 +7,7 @@
 using System;
 using System.Data;
 
-namespace TestlibCSV {
+namespace TestAlphaCSV {
     public static class AssertDataTable {
         //https://stackoverflow.com/questions/18365915/assert-areequal-method-usage-in-checking-datatable-types
 
