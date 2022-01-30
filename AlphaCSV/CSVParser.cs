@@ -291,9 +291,12 @@ namespace AlphaCSV {
         }
 
 
+        /*
+        //TODO: Implement this in the future.
         public static DataTable ReadSchemaFromFile(string filename) {
             throw new NotImplementedException("Not yet implemented");
         }
+        */
 
         /// <summary>
         /// Helper function to create an invalid operation exception and attach data to that exception
