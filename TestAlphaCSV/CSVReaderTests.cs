@@ -135,6 +135,29 @@ namespace TestAlphaCSV {
             fields = new string[] { "Hello", "Wo,rld" };
             yield return new object[] { line, fields };
         }
+
+        public static IEnumerable<object[]> MixedTypeFields() {
+            string line;
+            object[] expectedFields;
+
+            line = "Hello,1156";
+            expectedFields = new object[] { "Hello", 1156 };
+            yield return new object[] { line, expectedFields };
+
+            line = "1156,Hello";
+            expectedFields = new object[] { 1156, "Hello" };
+            yield return new object[] { line, expectedFields };
+
+            line = "1156,Hello,1.45";
+            expectedFields = new object[] { 1156, "Hello", 1.45 };
+            yield return new object[] { line, expectedFields };
+
+            //TODO: This test is failing. Investigate further.
+            //line = "1156,Hello,\"1,45\"";
+            //expectedFields = new object[] { 1156, "Hello", 1.45 };
+            //yield return new object[] { line, expectedFields };
+
+        }
         #endregion
 
         #region Input Generators
@@ -239,6 +262,13 @@ namespace TestAlphaCSV {
                 yield return testCase;
             }
         }
+
+        public static IEnumerable<object[]> MixedStringIntegersInputGenerator() {
+            IEnumerable<object[]> tests = InputGenerator(MixedTypeFields());
+            foreach (object[] testCase in tests) {
+                yield return testCase;
+            }
+        }
         #endregion
 
 
@@ -269,6 +299,7 @@ namespace TestAlphaCSV {
         [DynamicData(nameof(SimpleInputGenerator), DynamicDataSourceType.Method)]
         [DynamicData(nameof(QuotedInputGenerator), DynamicDataSourceType.Method)]
         [DynamicData(nameof(QuotedSimpleMixInputGenerator), DynamicDataSourceType.Method)]
+        [DynamicData(nameof(MixedStringIntegersInputGenerator), DynamicDataSourceType.Method)]
         public void TestDefinedParse(string input, DataTable expectedResult, CSVParseOptions options, TerminationType headerTermination, TerminationType lineTermination) {
             //Arrange
             Console.WriteLine($"Input:\n{input}\n");
