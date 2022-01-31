@@ -177,7 +177,7 @@ namespace TestAlphaCSV {
                 foreach (string headerTermination in HeaderTermination()) {
                     foreach (string termination in LineTermination()) {
                         fileBuilder.Clear();
-                        int numberOfFields = ((string[])data[1]).Length; //Add the header
+                        int numberOfFields = ((object[])data[1]).Length; //Add the header
                         //For number of expected fields. Build a CSV input file.
                         fileBuilder.Append(headerDictionary[numberOfFields]); //Add the header
                         fileBuilder.Append(headerTermination);
@@ -188,13 +188,13 @@ namespace TestAlphaCSV {
 
                         DataTable expectedResult = new DataTable();
                         string[] headers = ExpectedHeaderFields[numberOfFields];
-                        foreach (string s in headers) {
-                            expectedResult.Columns.Add(s, typeof(string));
+                        for (int i = 0; i < numberOfFields; i++) {
+                            expectedResult.Columns.Add(headers[i], ((object[])data[1])[i].GetType());
                         }
 
                         DataRow r = expectedResult.NewRow();
                         for (int i = 0; i < numberOfFields; i++) {
-                            r[i] = ((string[])data[1])[i];
+                            r[i] = ((object[])data[1])[i];
                         }
 
                         expectedResult.Rows.Add(r);
