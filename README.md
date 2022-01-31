@@ -74,7 +74,7 @@ public record Person {
 	public string Surname { get; set; }
 }
 ```
-A CSV file could can be parsed as follows:
+A CSV file containing the type could be parsed as follows:
 ```csharp
 CSVParser parser = new CSVParser();
 List<Person> persons = parser.ParseType<Person>(filepath);
