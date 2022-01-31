@@ -12,9 +12,11 @@ namespace TestAlphaCSV {
         //https://stackoverflow.com/questions/18365915/assert-areequal-method-usage-in-checking-datatable-types
 
         public static void AreEqual(DataTable expected, DataTable actual) {
+            //If both tables are null we consider them equal.
             if ((expected == null) && (actual == null)) {
                 return;
             } else if ((expected != null) && (actual != null)) {
+                //Check that the column count is the same
                 if ((expected.Columns.Count == actual.Columns.Count)) {
                     //Check that the column types are the same
                     for (int i = 0; i < expected.Columns.Count; i++) {
@@ -33,6 +35,7 @@ namespace TestAlphaCSV {
                 }
 
                 //Up to this point we have verified the columns. Now we are going th verify the rows
+                //Just verify the values. Types have already been verified through the column checks.
                 if (expected.Rows.Count == actual.Rows.Count) {
                     for (int i = 0; i < expected.Columns.Count; i++) {
                         for (int j = 0; j < expected.Rows.Count; j++) {
@@ -43,15 +46,16 @@ namespace TestAlphaCSV {
                     }
                     return;
                 } else {
-                    return;
+                    throw new Exception($"Rows count is not equal! Expected{expected.Rows.Count} Actual {actual.Rows.Count}");
                 }
             } else {
+                //Give more information to the user.
                 if (expected == null) {
-                    throw new Exception("Expected table is null!");
+                    throw new Exception("Expected table is null! But Actual table is not.");
                 }
 
                 if (actual == null) {
-                    throw new Exception("Actual table is null!");
+                    throw new Exception("Actual table is null! But expected table is not.");
                 }
             }
         } //End of Compare Data Datables
