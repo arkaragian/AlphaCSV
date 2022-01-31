@@ -165,11 +165,15 @@ namespace TestAlphaCSV {
             Dictionary<int, string> headerDictionary = new Dictionary<int, string>() {
                 {1,"ColumnA" },
                 {2,"ColumnA,ColumnB" },
+                {3,"ColumnA,ColumnB,ColumnC" },
+                {4,"ColumnA,ColumnB,ColumnC,ColumnD" },
             };
 
             Dictionary<int, string[]> ExpectedHeaderFields = new Dictionary<int, string[]>() {
                 {1,new string[]{"ColumnA"}},
                 {2,new string[]{"ColumnA", "ColumnB"}},
+                {3,new string[]{"ColumnA", "ColumnB","ColumnC"}},
+                {4,new string[]{"ColumnA", "ColumnB","ColumnC","ColumnD"}},
             };
 
             StringBuilder fileBuilder = new StringBuilder();
