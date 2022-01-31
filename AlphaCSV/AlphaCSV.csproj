@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.0.0-alpha0</Version>
-    <PackageVersion>1.0.0-alpha0</PackageVersion>
+    <Version>1.0.0-alpha1</Version>
+    <PackageVersion>1.0.0-alpha1</PackageVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>A small library that reads and writes CSV files.</Description>
     <Copyright>Aris Karagiannidis 2021-2022</Copyright>
