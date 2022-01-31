@@ -153,9 +153,9 @@ namespace TestAlphaCSV {
             yield return new object[] { line, expectedFields };
 
             //TODO: This test is failing. Investigate further.
-            //line = "1156,Hello,\"1,45\"";
-            //expectedFields = new object[] { 1156, "Hello", 1.45 };
-            //yield return new object[] { line, expectedFields };
+            line = "1156,Hello,\"1,45\"";
+            expectedFields = new object[] { 1156, "Hello", 1.45 };
+            yield return new object[] { line, expectedFields };
 
         }
         #endregion
@@ -318,5 +318,39 @@ namespace TestAlphaCSV {
             //Assert
             AssertDataTable.AreEqual(expectedResult, table);
         }
+
+
+#if false
+        //This is a single debug method aiming to provide a scrapbook in order to debug a test.
+        [TestMethod]
+        public void DebugSingleCase() {
+            //Arrange
+            MockFileSystem fs = new MockFileSystem();
+            MockFileData mockInputFile = new MockFileData("ColumnA,ColumnB,ColumnC\n1156,Hello,\"1,45\"");
+            string path = @"C:\test.csv";
+            fs.AddFile(path, mockInputFile);
+
+            DataTable expectedResult = new DataTable();
+            expectedResult.Columns.Add(new DataColumn("ColumnA", typeof(int)));
+            expectedResult.Columns.Add(new DataColumn("ColumnB", typeof(string)));
+            expectedResult.Columns.Add(new DataColumn("ColumnC", typeof(double)));
+
+            DataRow r = expectedResult.NewRow();
+            r[0] = (int)1156;
+            r[1] = "Hello";
+            r[2] = 1.45;
+
+            expectedResult.Rows.Add(r);
+
+            //Act
+            CSVParser parser = new CSVParser(fs); //Inject dependency here
+            //Since we have the expected result we just clone the schema instead of building it by hand.
+            DataTable table = parser.ParseDefinedCSV(expectedResult.Clone(), path);
+
+            //Assert
+            AssertDataTable.AreEqual(expectedResult, table);
+        }
+#endif
+
     }
 }
