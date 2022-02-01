@@ -105,4 +105,4 @@ method as it always checks for the correct names.
 - The `DateTimeFormat` indicates to the parser the format of any DateTime that may be contained in the file. (Default is `""`).
 - The `ContainsHeaders` indicates if the CSV file has a header row. (Default value is `false`) note that this option is not taken into account when reading a defined CSV.
 - The `AllowEmptyLastField` Indicates wether the last field of the file lines can be empty. (eg when there is no data on the last field) Default `true`.
-
+- The `DecimalSeperator` Indicates which character will be used a decimal number seperator. Default value is '.'
