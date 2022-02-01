@@ -142,26 +142,31 @@ namespace AlphaCSV {
 
                 DataRow r = table.NewRow();
                 for (int i = 0; i < table.Columns.Count; i++) {
-                    if (schema.Columns[i].DataType == typeof(DateTime)) {
-                        //If there are no options. Try a parsing. If there are options parse the stuff as needed.
-                        //TODO: Log this with an ILogger
-                        if (string.IsNullOrEmpty(options.DateTimeFormat)) {
-                            DateTime theDate;
-                            DateTime.TryParse(fields[i], out theDate);
-                            r[i] = theDate;
-                        } else {
-                            r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
-                        }
-                    } else if (schema.Columns[i].DataType == typeof(double) || schema.Columns[i].DataType == typeof(decimal) || schema.Columns[i].DataType == typeof(float)) {
-                        //TODO: This could be a performance bottleneck since we are potentially
-                        //processing thousands of strings.
-                        //TODO: This needs to be extended to multiple types such as decimals.
-                        if (options.DecimalSeperator != '.') {
-                            fields[i] = fields[i].Replace(options.DecimalSeperator, '.');
-                        }
-                        r[i] = double.Parse(fields[i]);
-                    } else {
-                        r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
+                    switch (table.Columns[i].DataType.ToString()) {
+                        case "System.DateTime":
+                            //If there are no options. Try a parsing. If there are options parse the stuff as needed.
+                            //TODO: Log this with an ILogger
+                            if (string.IsNullOrEmpty(options.DateTimeFormat)) {
+                                DateTime theDate;
+                                DateTime.TryParse(fields[i], out theDate);
+                                r[i] = theDate;
+                            } else {
+                                r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
+                            }
+                            break;
+                        case "System.Double":
+                        case "System.Decimal":
+                        case "System.Single":
+                            //TODO: This could be a performance bottleneck since we are potentially
+                            //processing thousands of strings.
+                            if (options.DecimalSeperator != '.') {
+                                fields[i] = fields[i].Replace(options.DecimalSeperator, '.');
+                            }
+                            r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
+                            break;
+                        default:
+                            r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
+                            break;
                     }
                 }
                 table.Rows.Add(r);
