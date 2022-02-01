@@ -161,6 +161,13 @@ namespace TestAlphaCSV {
             expectedFields = new object[] { 1156, "Hello", 1.45 };
             yield return new object[] { line, expectedFields, options };
 
+            line = "1156,Hello,\"1,45\"";
+            expectedFields = new object[] { 1156, "Hello", 1.45m }; //With Decimal
+            yield return new object[] { line, expectedFields, options };
+
+            line = "1156,Hello,\"1,45\"";
+            expectedFields = new object[] { 1156, "Hello", 1.45f }; //With float
+            yield return new object[] { line, expectedFields, options };
         }
         #endregion
 
@@ -307,10 +314,18 @@ namespace TestAlphaCSV {
             //Arrange
             Console.WriteLine($"Input:\n{input}\n");
             Console.WriteLine($"Header termination: {headerTermination}, Record Termination: {lineTermination}");
+
+            Console.WriteLine("Schema Definition:");
+            foreach (DataColumn c in expectedResult.Columns) {
+                Console.Write($"{c.DataType}\t");
+            }
+            Console.Write("\n");
+
             MockFileSystem fs = new MockFileSystem();
             MockFileData mockInputFile = new MockFileData(input);
             string path = @"C:\test.csv";
             fs.AddFile(path, mockInputFile);
+
 
 
             //Act
