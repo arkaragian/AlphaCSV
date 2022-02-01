@@ -65,21 +65,22 @@ namespace TestAlphaCSV {
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<object[]> SimpleFields() {
+            CSVParseOptions options = new CSVParseOptions();
 
             string parserInput;
             string[] expectedParseResult;
 
             parserInput = "Hello";
             expectedParseResult = new string[] { "Hello" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
 
             parserInput = "Hello,";
             expectedParseResult = new string[] { "Hello", "" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
 
             parserInput = "Hello,World";
             expectedParseResult = new string[] { "Hello", "World" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
 
         }
 
@@ -88,29 +89,30 @@ namespace TestAlphaCSV {
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<object[]> QuotedFields() {
+            CSVParseOptions options = new CSVParseOptions();
 
             string parserInput;
             string[] expectedParseResult;
 
             parserInput = "\"Hello\"";
             expectedParseResult = new string[] { "Hello" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
 
             parserInput = "\"Hello\",";
             expectedParseResult = new string[] { "Hello", "" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
 
             parserInput = "\"Hello\",\"\"";
             expectedParseResult = new string[] { "Hello", "" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
 
             parserInput = "\"Hello\",\"World\"";
             expectedParseResult = new string[] { "Hello", "World" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
 
             parserInput = "\"He,llo\",\"World\"";
             expectedParseResult = new string[] { "He,llo", "World" };
-            yield return new object[] { parserInput, expectedParseResult };
+            yield return new object[] { parserInput, expectedParseResult, options };
         }
 
         /// <summary>
@@ -125,37 +127,39 @@ namespace TestAlphaCSV {
 
             line = "\"He,llo\",World";
             fields = new string[] { "He,llo", "World" };
-            yield return new object[] { line, fields };
+            yield return new object[] { line, fields, options };
 
             line = "Hello,\"World\"";
             fields = new string[] { "Hello", "World" };
-            yield return new object[] { line, fields };
+            yield return new object[] { line, fields, options };
 
             line = "Hello,\"Wo,rld\"";
             fields = new string[] { "Hello", "Wo,rld" };
-            yield return new object[] { line, fields };
+            yield return new object[] { line, fields, options };
         }
 
         public static IEnumerable<object[]> MixedTypeFields() {
+            CSVParseOptions options = new CSVParseOptions();
+
             string line;
             object[] expectedFields;
 
             line = "Hello,1156";
             expectedFields = new object[] { "Hello", 1156 };
-            yield return new object[] { line, expectedFields };
+            yield return new object[] { line, expectedFields, options };
 
             line = "1156,Hello";
             expectedFields = new object[] { 1156, "Hello" };
-            yield return new object[] { line, expectedFields };
+            yield return new object[] { line, expectedFields, options };
 
             line = "1156,Hello,1.45";
             expectedFields = new object[] { 1156, "Hello", 1.45 };
-            yield return new object[] { line, expectedFields };
+            yield return new object[] { line, expectedFields, options };
 
-            //TODO: This test is failing. Investigate further.
+            options.DecimalSeperator = ',';
             line = "1156,Hello,\"1,45\"";
             expectedFields = new object[] { 1156, "Hello", 1.45 };
-            yield return new object[] { line, expectedFields };
+            yield return new object[] { line, expectedFields, options };
 
         }
         #endregion
@@ -182,7 +186,6 @@ namespace TestAlphaCSV {
         /// <param name="Method">The method that returns the required fields</param>
         /// <returns></returns>
         private static IEnumerable<object[]> InputGenerator(IEnumerable<object[]> Method) {
-            CSVParseOptions options = new CSVParseOptions();
 
             //Create a template for generic columns that will be used to generate the datatable
             Dictionary<int, string> headerDictionary = new Dictionary<int, string>() {
@@ -235,7 +238,7 @@ namespace TestAlphaCSV {
                         }
 
                         //We return the file input. The expected headers, the expected fields, and the parse options
-                        yield return new object[] { fileBuilder.ToString(), expectedResult, options, headTerm, lineTerm };
+                        yield return new object[] { fileBuilder.ToString(), expectedResult, data[2], headTerm, lineTerm };
                     }
                 }
             }
@@ -320,7 +323,7 @@ namespace TestAlphaCSV {
         }
 
 
-#if false
+#if true
         //This is a single debug method aiming to provide a scrapbook in order to debug a test.
         [TestMethod]
         public void DebugSingleCase() {
@@ -345,7 +348,10 @@ namespace TestAlphaCSV {
             //Act
             CSVParser parser = new CSVParser(fs); //Inject dependency here
             //Since we have the expected result we just clone the schema instead of building it by hand.
-            DataTable table = parser.ParseDefinedCSV(expectedResult.Clone(), path);
+            CSVParseOptions options = new CSVParseOptions {
+                DecimalSeperator = ','
+            };
+            DataTable table = parser.ParseDefinedCSV(expectedResult.Clone(), path, options);
 
             //Assert
             AssertDataTable.AreEqual(expectedResult, table);
