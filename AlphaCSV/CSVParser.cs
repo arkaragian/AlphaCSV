@@ -152,12 +152,18 @@ namespace AlphaCSV {
                         } else {
                             r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
                         }
+                    } else if (schema.Columns[i].DataType == typeof(double) || schema.Columns[i].DataType == typeof(decimal) || schema.Columns[i].DataType == typeof(float)) {
+                        //TODO: This could be a performance bottleneck since we are potentially
+                        //processing thousands of strings.
+                        //TODO: This needs to be extended to multiple types such as decimals.
+                        if (options.DecimalSeperator != '.') {
+                            fields[i] = fields[i].Replace(options.DecimalSeperator, '.');
+                        }
+                        r[i] = double.Parse(fields[i]);
                     } else {
                         r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
                     }
-
                 }
-
                 table.Rows.Add(r);
             }
             return table;
