@@ -53,6 +53,11 @@ namespace AlphaCSV {
         /// </summary>
         public bool AllowEmptyLastField { get; set; }
 
+        /// <summary>
+        /// Defines the decimal seperator for parsing non integer numbers.
+        /// </summary>
+        public char DecimalSeperator { get; set; }
+
         public CSVParseOptions() {
             Delimeter = ',';
             CommentCharacter = '#';
@@ -61,6 +66,7 @@ namespace AlphaCSV {
             ValidateFields = false;
             DateTimeFormat = "";
             AllowEmptyLastField = true;
+            DecimalSeperator = '.';
         }
 
     }
