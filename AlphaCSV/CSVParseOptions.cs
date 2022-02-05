@@ -19,7 +19,7 @@ namespace AlphaCSV {
         /// Indicates the characted that comprises the quotes
         /// <remarks>The character is null if we don't have quoted fields</remarks>
         /// </summary>
-        public char? QuoteCharacter { get; set; }
+        public char QuoteCharacter { get; set; }
 
         /// <summary>
         /// Indicate if the file contains headers

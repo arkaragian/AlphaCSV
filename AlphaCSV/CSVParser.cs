@@ -2,11 +2,14 @@
 // Copyright (c) Aris Karagiannidis and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
-using System.Data;
-using System.Text.RegularExpressions;
-using System.IO.Abstractions;
 using AlphaCSV.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO.Abstractions;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace AlphaCSV {
     /// <summary>
@@ -196,8 +199,8 @@ namespace AlphaCSV {
             List<Tuple<Type, MethodInfo>> comprisingTypes = new List<Tuple<Type, MethodInfo>>();
             foreach (PropertyInfo pi in properties) {
                 if (pi.CanWrite) {
-                    MethodInfo? info = pi.GetSetMethod();
-                    if (info is not null) {
+                    MethodInfo info = pi.GetSetMethod();
+                    if (info != null) {
                         propertyTypes.Add(pi.PropertyType);
                         propertySetMethods.Add(pi.GetSetMethod());
                         propertNames.Add(pi.Name);

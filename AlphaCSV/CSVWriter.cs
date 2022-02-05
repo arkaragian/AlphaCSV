@@ -1,5 +1,8 @@
 ﻿using AlphaCSV.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.IO.Abstractions;
 using System.Text;
 
@@ -42,7 +45,7 @@ namespace AlphaCSV {
                 string colName = data.Columns[i].ColumnName;
                 bool quoted = false;
 
-                if (colName.Contains(options.Delimeter)) {
+                if (colName.IndexOf(options.Delimeter) >= 0) {
                     sb.Append(options.QuoteCharacter);
                     quoted = true;
                 }
@@ -81,7 +84,7 @@ namespace AlphaCSV {
                     }
                     bool quoted = false;
 
-                    if (field.Contains(options.Delimeter)) {
+                    if (field.IndexOf(options.Delimeter) >= 0) {
                         sb.Append(options.QuoteCharacter);
                         quoted = true;
                     }
