@@ -15,6 +15,7 @@
     <PackageTags>CSV,csv</PackageTags>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Authors>Aris Karagiannidis</Authors>
   </PropertyGroup>
 
   <ItemGroup>
