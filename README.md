@@ -106,3 +106,51 @@ method as it always checks for the correct names.
 - The `ContainsHeaders` indicates if the CSV file has a header row. (Default value is `false`) note that this option is not taken into account when reading a defined CSV.
 - The `AllowEmptyLastField` Indicates wether the last field of the file lines can be empty. (eg when there is no data on the last field) Default `true`.
 - The `DecimalSeperator` Indicates which character will be used a decimal number seperator. Default value is '.'
+
+## Setting up a Development environment
+The project uses commit linting thus:
+
+you need to install node js and npm and follow the instructions bellow
+
+```sh
+# Install commitlint cli and conventional config
+npm install --save-dev @commitlint/{config-conventional,cli}
+# For Windows:
+npm install --save-dev @commitlint/config-conventional @commitlint/cli
+
+# Configure commitlint to use conventional config
+echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
+```
+
+To lint commits before they are created you can use Husky's `commit-msg` hook:
+
+```sh
+# Install Husky v6
+npm install husky --save-dev
+# or
+yarn add husky --dev
+
+# Activate hooks
+npx husky install
+# or
+yarn husky install
+
+# Add hook
+npx husky add .husky/commit-msg 'npx --no -- commitlint --edit "$1"'
+# Sometimes above command doesn't work in some command interpreters
+# You can try other commands below to write npx --no -- commitlint --edit $1
+# in the commit-msg file.
+npx husky add .husky/commit-msg \"npx --no -- commitlint --edit '$1'\"
+# or
+npx husky add .husky/commit-msg "npx --no -- commitlint --edit $1"
+
+# or
+yarn husky add .husky/commit-msg 'yarn commitlint --edit $1'
+```
+
+Check the [husky documentation](https://typicode.github.io/husky/#/?id=manual) on how you can automatically have Git hooks enabled after install for different `yarn` versions.
+
+**Detailed Setup instructions**
+
+- [Local setup](https://conventional-changelog.github.io/commitlint/#/guides-local-setup) - Lint messages on commit with husky
+- [CI setup](https://conventional-changelog.github.io/commitlint/#/guides-ci-setup) - Lint messages during CI builds
