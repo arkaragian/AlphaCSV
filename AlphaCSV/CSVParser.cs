@@ -41,7 +41,7 @@ namespace AlphaCSV {
         /// <param name="options">(Optional argument) The options of the file that will be read.</param>
         /// <param name="validationPatterns">(Optional Argument) Validation patterns in terms of regular expressions</param>
         /// <returns>The contents of a CSV file in the form of a datatable</returns>
-        public DataTable ParseSimpleCSV(string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+        public DataTable ParseSimpleCSV(string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
             //Before we continue we need to make some assumptions for the file. e.g to know how many fields we need to parse.
             //Thus we read only the first line, deduce information there and try to move forward.
 
@@ -73,24 +73,23 @@ namespace AlphaCSV {
         /// <remarks>This argument will only be used if the relevant flag is enabled in the parse options.</remarks>
         /// </param>
         /// <returns>The contents of the CSV file inside a datatable</returns>
-        public DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+        public DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
             //Use the default options if the user does not provide them.
             if (options == null) {
                 options = new CSVParseOptions();
             }
 
-
-            //TODO: Perform a check for the file size. Maybe warn the user that there might be memory issues. 
+            //TODO: Do not read the complete file. Instead read one row at a time
             string[] lines = FSInterface.File.ReadAllLines(path);
             DataTable table = schema.Clone();
 
             if (options.ValidateFields) {
                 if (validationPatterns != null) {
                     if (validationPatterns.Count != schema.Columns.Count) {
-                        throw GenerateInvalidOpException("The number of validation patterns given do not match the number of columns in the file schema", options, validationPatterns);
+                        throw GenerateInvalidOpException("The number of validation patterns given do not match the number of columns in the file schema", options);
                     }
                 } else {
-                    throw GenerateInvalidOpException("Field validation was requested but no validation patterns were provided.", options, validationPatterns);
+                    throw GenerateInvalidOpException("Field validation was requested but no validation patterns were provided.", options);
                 }
             }
             //Keep track of the current row for informational purposes.
@@ -108,7 +107,7 @@ namespace AlphaCSV {
                 //Split our fields with the delimeter.
                 string[] fields = ParseLine(line, options);
                 if (fields.Length != schema.Columns.Count) {
-                    throw GenerateInvalidOpException($"The number of columns found in the file: {fields.Length} do not match the number of columns declared in the schema {schema.Columns.Count}. Offending row:{globalRow}", options, validationPatterns);
+                    throw GenerateInvalidOpException($"The number of columns found in the file: {fields.Length} do not match the number of columns declared in the schema {schema.Columns.Count}. Offending row:{globalRow}", options);
                 }
                 //If we are in the first line
                 if (dataRow == 1) {
@@ -117,7 +116,7 @@ namespace AlphaCSV {
                         int index = 0;
                         foreach (string f in fields) {
                             if (!f.Equals(schema.Columns[index].ColumnName)) {
-                                throw GenerateInvalidOpException("Column Names do not match. Offending names are " + f + " and " + schema.Columns[index].ColumnName, options, validationPatterns);
+                                throw GenerateInvalidOpException("Column Names do not match. Offending names are " + f + " and " + schema.Columns[index].ColumnName, options);
                             }
                             index++;
                         }
@@ -127,17 +126,15 @@ namespace AlphaCSV {
 
                 //Before trying to do any operation verify that we have the correct number of fields.
                 if (schema.Columns.Count != fields.Length) {
-                    throw GenerateInvalidOpException($"The number of fields present in the line {fields.Length} do not match the numer of fields defined in the schema {schema.Columns.Count}. Offending row:{globalRow}", options, validationPatterns);
+                    throw GenerateInvalidOpException($"The number of fields present in the line {fields.Length} do not match the numer of fields defined in the schema {schema.Columns.Count}. Offending row:{globalRow}", options);
                 }
 
                 if (options.ValidateFields) {
                     //Check that the file is correct
                     for (int i = 0; i < validationPatterns.Count; i++) {
-                        string pattern = validationPatterns[i];
-                        Regex rg = new Regex(pattern);
-                        Match match = rg.Match(fields[i]);
-                        if (!match.Success) {
-                            throw GenerateInvalidOpException($"Could not match the {pattern} with the field {i + 1} with field contents {fields[i]}. Offending row:{globalRow}", options, validationPatterns);
+                        bool correct = validationPatterns[i](fields[i]);
+                        if (!correct) {
+                            throw GenerateInvalidOpException($"Could not validate field {i + 1} with contents {fields[i]} did not pass validation. Offending row:{globalRow}", options);
                         }
                     }
                 }
@@ -177,6 +174,7 @@ namespace AlphaCSV {
             return table;
         }
 
+
         /// <summary>
         /// Parses a CSV file containing values for the public set properties of the specified type
         /// </summary>
@@ -186,7 +184,7 @@ namespace AlphaCSV {
         /// <param name="validationPatterns">Validation Patterns</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public List<T> ParseType<T>(string path, CSVParseOptions options = null, List<string> validationPatterns = null) {
+        public List<T> ParseType<T>(string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
             Type genType = typeof(T);
             ConstructorInfo constructor = genType.GetConstructor(new Type[] { });
             PropertyInfo[] properties = genType.GetProperties();
