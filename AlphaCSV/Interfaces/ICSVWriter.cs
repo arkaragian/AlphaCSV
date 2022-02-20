@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace AlphaCSV.Interfaces {
     public interface ICSVWriter {
-        void WriteCSV(string filename, DataTable data, CSVParseOptions options = null);
+        void WriteCSV(string filename, DataTable data, CSVWriteOptions options = null);
     }
 }

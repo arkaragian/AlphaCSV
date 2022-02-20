@@ -35,43 +35,46 @@ namespace AlphaCSV {
         /// <param name="data">The data to write</param>
         /// <param name="options">CSV Parsing options</param>
         /// <exception cref="InvalidOperationException"></exception>
-        public void WriteCSV(string filename, DataTable data, CSVParseOptions options = null) {
+        public void WriteCSV(string filename, DataTable data, CSVWriteOptions options = null) {
             if (options == null) {
-                options = new CSVParseOptions();
+                options = new CSVWriteOptions();
             }
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < data.Columns.Count; i++) {
-                string colName = data.Columns[i].ColumnName;
-                bool quoted = false;
+            string header = null;
+            if (options.WriteHeaders) {
+                for (int i = 0; i < data.Columns.Count; i++) {
+                    string colName = data.Columns[i].ColumnName;
+                    bool quoted = false;
 
-                if (colName.IndexOf(options.Delimeter) >= 0) {
-                    sb.Append(options.QuoteCharacter);
-                    quoted = true;
-                }
-
-                foreach (char c in colName) {
-                    if (c == options.QuoteCharacter && quoted) {
-                        //TODO: Decide if I want to escape the character
-                        throw new InvalidOperationException($"Field cannot contain the quote character {c}");
+                    if (colName.IndexOf(options.Delimeter) >= 0) {
+                        sb.Append(options.QuoteCharacter);
+                        quoted = true;
                     }
-                    sb.Append(c);
-                }
 
-                if (quoted) {
-                    sb.Append(options.QuoteCharacter);
-                    quoted = false;
-                }
+                    foreach (char c in colName) {
+                        if (c == options.QuoteCharacter && quoted) {
+                            //TODO: Decide if I want to escape the character
+                            throw new InvalidOperationException($"Field cannot contain the quote character {c}");
+                        }
+                        sb.Append(c);
+                    }
 
-                if (i != data.Columns.Count - 1) {
-                    sb.Append(options.Delimeter);
+                    if (quoted) {
+                        sb.Append(options.QuoteCharacter);
+                        quoted = false;
+                    }
+
+                    if (i != data.Columns.Count - 1) {
+                        sb.Append(options.Delimeter);
+                    }
                 }
+                sb.Append('\r');
+                sb.Append('\n');
+                header = sb.ToString();
+                sb.Clear();
             }
-            sb.Append('\r');
-            sb.Append('\n');
-            string header = sb.ToString();
 
-            sb.Clear();
             List<string> lines = new List<string>();
 
             for (int i = 0; i < data.Rows.Count; i++) {
@@ -120,7 +123,9 @@ namespace AlphaCSV {
             }
             Stream fileStream = FSInterface.File.OpenWrite(filename);
             StreamWriter writer = new StreamWriter(fileStream);
-            writer.Write(header);
+            if (header != null) {
+                writer.Write(header);
+            }
             for (int i = 0; i < lines.Count; i++) {
                 writer.Write(lines[i]);
             }
