@@ -4,22 +4,12 @@
 //
 
 namespace AlphaCSV {
-    public class CSVParseOptions {
-        /// <summary>
-        /// The delimeter that will be used in the CSV file.
-        /// </summary>
-        public char Delimeter { get; set; }
+    public class CSVParseOptions : BaseCSVOptions {
 
         /// <summary>
         /// Determines the comment character. Lines starting with this character will be ignored.
         /// </summary>
         public char CommentCharacter { get; set; }
-
-        /// <summary>
-        /// Indicates the characted that comprises the quotes
-        /// <remarks>The character is null if we don't have quoted fields</remarks>
-        /// </summary>
-        public char QuoteCharacter { get; set; }
 
         /// <summary>
         /// Indicate if the file contains headers
@@ -37,14 +27,6 @@ namespace AlphaCSV {
         public bool ValidateFields { get; set; }
 
         /// <summary>
-        /// Defines the format of the date time.
-        /// <remarks>
-        /// This format is empty by default.
-        /// </remarks>
-        /// </summary>
-        public string DateTimeFormat { get; set; }
-
-        /// <summary>
         /// Indicates wether the last field of the file lines can be empty. (eg when there is no data on the last field).
         /// <remarks>
         /// Some programs may not output anything if the last field that they are trying to output is empty not even an empty quote.
@@ -52,11 +34,6 @@ namespace AlphaCSV {
         /// </remarks>
         /// </summary>
         public bool AllowEmptyLastField { get; set; }
-
-        /// <summary>
-        /// Defines the decimal seperator for parsing non integer numbers.
-        /// </summary>
-        public char DecimalSeperator { get; set; }
 
         public CSVParseOptions() {
             Delimeter = ',';
