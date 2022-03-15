@@ -152,6 +152,7 @@ This class controls the behavior of the `CSVWriter` and may be passed to the wri
 The options can be set through the public properies of the class. The parameters that can be controlled are the following :
 - The `Delimeter`. This is the character that seperates the fields within the file. (Default value of `,`).
 - The `QuoteCharacter`. This is the character that escapes a field if that field contains the `Delimerer` character.
+- The `QuoteFieldsWithoutDelimeter`. This flag indicates if field quoting will be enforced in the fields that do not contain a `Delimeter`.
 - The `WriteHeaders`. This option directs the `CSVWriter` to indicate if the datatable names should be written as headers in the CSV file (Default value of `true`).
 - The `DateTimeFormat` indicates to the `CSVWriter` the format of the DateTime that will be writtern in the file. (Default is `"dd-MMM-yyyy"`).
 - The `DecimalSeperator` Indicates which character will be used a decimal number seperator. Default value is '.'
