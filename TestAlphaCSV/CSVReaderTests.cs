@@ -82,6 +82,16 @@ namespace TestAlphaCSV {
             expectedParseResult = new string[] { "Hello", "World" };
             yield return new object[] { parserInput, expectedParseResult, options };
 
+
+            parserInput = "Hello,,";
+            expectedParseResult = new string[] { "Hello", "", "" };
+            yield return new object[] { parserInput, expectedParseResult, options };
+
+
+            parserInput = "Hello,,World";
+            expectedParseResult = new string[] { "Hello", "", "World" };
+            yield return new object[] { parserInput, expectedParseResult, options };
+
         }
 
         /// <summary>
@@ -113,6 +123,15 @@ namespace TestAlphaCSV {
             parserInput = "\"He,llo\",\"World\"";
             expectedParseResult = new string[] { "He,llo", "World" };
             yield return new object[] { parserInput, expectedParseResult, options };
+
+            parserInput = "\"Hello\",\"\",\"404001286301\"";
+            expectedParseResult = new string[] { "Hello", "", "404001286301" };
+            yield return new object[] { parserInput, expectedParseResult, options };
+
+            parserInput = "\"Hello\",\"\",\"\"";
+            expectedParseResult = new string[] { "Hello", "", "" };
+            yield return new object[] { parserInput, expectedParseResult, options };
+
         }
 
         /// <summary>
@@ -331,6 +350,9 @@ namespace TestAlphaCSV {
             //Act
             CSVParser parser = new CSVParser(fs); //Inject dependency here
             //Since we have the expected result we just clone the schema instead of building it by hand.
+            if (input.Contains("404001286301")) {
+                int a = 5;
+            }
             DataTable table = parser.ParseDefinedCSV(expectedResult.Clone(), path, options);
 
             //Assert
@@ -338,7 +360,7 @@ namespace TestAlphaCSV {
         }
 
 
-#if true
+#if false 
         //This is a single debug method aiming to provide a scrapbook in order to debug a test.
         [TestMethod]
         public void DebugSingleCase() {
