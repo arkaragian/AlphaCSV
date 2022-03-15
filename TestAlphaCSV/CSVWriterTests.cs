@@ -172,6 +172,28 @@ namespace TestAlphaCSV {
         }
 
         [TestMethod]
+        public void TestWrittenContentWithQuotes() {
+            //Arrange
+            DataTable table = GetSimpleTable();
+            MockFileSystem fileSystem = new MockFileSystem();
+            CSVWriteOptions options = new CSVWriteOptions();
+            options.QuoteFieldsWithoutDelimeter = true;
+            CSVWriter writer = new CSVWriter(fileSystem);
+
+            string line = "\"ColumnA\",\"ColumnB\"";
+            string line2 = "\"Hello\",\"World\"";
+            string line3 = "\"Hello2\",\"World2\"";
+            string[] expectedLines = { line, line2, line3 };
+
+            //Act
+            writer.WriteCSV("test.csv", table,options);
+
+            //Assert
+            string[] readLines = fileSystem.File.ReadAllLines("test.csv");
+            CollectionAssert.AreEqual(expectedLines, readLines);
+        }
+
+        [TestMethod]
         public void TestNumberOfBytes() {
             //Arrange
             DataTable table = GetSimpleTable();
