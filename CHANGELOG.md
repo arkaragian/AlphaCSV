@@ -1,4 +1,13 @@
-# [](https://github.com/arkaragian/AlphaCSV/compare/v1.0.0-alpha0...v) (2022-03-15)
+# [](https://github.com/arkaragian/AlphaCSV/compare/v1.0.0-beta.0...v) (2022-03-15)
+
+
+### Bug Fixes
+
+* fix issue [#9](https://github.com/arkaragian/AlphaCSV/issues/9) ([888c935](https://github.com/arkaragian/AlphaCSV/commit/888c93553f32e1c7eb7754b92c3280ba452f8c72))
+
+
+
+# [1.0.0-beta.0](https://github.com/arkaragian/AlphaCSV/compare/v1.0.0-alpha0...v1.0.0-beta.0) (2022-03-15)
 
 
 ### Bug Fixes
@@ -26,6 +35,10 @@ writing CSV files.
 * Regular expressions are no longer beeing accepted.
 Any old code that used such expressions should now be wrapped arround
 a delegate method.
+
+
+
+# 1.0.0-alpha0 (2022-01-30)
 
 
 
