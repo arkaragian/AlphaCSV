@@ -47,7 +47,7 @@ namespace AlphaCSV {
                     string colName = data.Columns[i].ColumnName;
                     bool quoted = false;
 
-                    if (colName.IndexOf(options.Delimeter) >= 0) {
+                    if (colName.IndexOf(options.Delimeter) >= 0 || options.QuoteFieldsWithoutDelimeter) {
                         sb.Append(options.QuoteCharacter);
                         quoted = true;
                     }
@@ -87,7 +87,7 @@ namespace AlphaCSV {
                     }
                     bool quoted = false;
 
-                    if (field.IndexOf(options.Delimeter) >= 0) {
+                    if (field.IndexOf(options.Delimeter) >= 0 || options.QuoteFieldsWithoutDelimeter) {
                         sb.Append(options.QuoteCharacter);
                         quoted = true;
                     }
