@@ -246,21 +246,27 @@ namespace AlphaCSV {
 
             bool insideField = false;
             string currentField = "";
+            char? previous = null;
             for (int i = 0; i < line.Length; i++) {
                 char c = line[i];
                 //We hit a quote. This is either the start or the end of the field
                 if (c == options.QuoteCharacter) {
-                    //If we are the start of the field then the field is either empty or null.
-                    //This is a sufficient indicator if we are at the start of the field.
-                    //Note the insideField flag is required only when we use a quote.
-                    if (string.IsNullOrEmpty(currentField)) {
-                        insideField = true;
+                    //If we are at the start of the field then the field is either empty or null.
+                    //This is not a sufficient indicator if we are at the start of the field. Becasuse we might
+                    //be dealing with an empty quoted field. Note the insideField flag is required only when we
+                    //use a quote.
+                    if (string.IsNullOrEmpty(currentField) && previous != options.QuoteCharacter) {
+                        insideField = true; 
                     } else {
+                        //If we have a null field and the previous character is the quote character then we can assume that
+                        //We have enciuntered a empty quoted field. Thus we change the state back to a "non inside field" state.
                         insideField = false;
                     }
+                    previous = c;
                     //The delimeter could be the last character of the line. Check that and add the field to the list
                     if (i == line.Length - 1) {
                         fields.Add(currentField);
+                        previous = c;
                     }
                     //continue;
                 } else if (c == options.Delimeter) {
@@ -270,6 +276,7 @@ namespace AlphaCSV {
                         currentField += c;
                     } else {
                         fields.Add(currentField);
+                        previous = c;
                         currentField = "";
                         //Now we have now reset our state and we are ready to move on.
                         //However if we are at the end of the line this means that the
@@ -286,9 +293,11 @@ namespace AlphaCSV {
                         if (string.IsNullOrEmpty(currentField)) {
                             if (options.AllowEmptyLastField) {
                                 fields.Add(currentField);
+                                previous = c;
                             }
                         } else {
                             fields.Add(currentField);
+                            previous = c;
                         }
                     }
                 } else {
@@ -296,6 +305,7 @@ namespace AlphaCSV {
                     //This means that we are at the end of the line Though the line is not \n terminated. Add whatever field is computed.
                     if (i == line.Length - 1) {
                         fields.Add(currentField);
+                        previous = c;
                     }
                 }
             }
