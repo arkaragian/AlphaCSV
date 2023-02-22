@@ -47,15 +47,19 @@ namespace AlphaCSV {
                     string colName = data.Columns[i].ColumnName;
                     bool quoted = false;
 
+                    //If the field contains the file delimeter. We need to enclose it in quotes
+                    //however if now, the field contains both the delimeter and the quote then we
+                    //need to escape the quote.
                     if (colName.IndexOf(options.Delimeter) >= 0 || options.QuoteFieldsWithoutDelimeter) {
                         sb.Append(options.QuoteCharacter);
                         quoted = true;
                     }
 
                     foreach (char c in colName) {
+                        //If we are in a quoted field and we find a quote character inside the fields
+                        //we must escape it according to RFC4180 section 2 item 7.
                         if (c == options.QuoteCharacter && quoted) {
-                            //TODO: Decide if I want to escape the character
-                            throw new InvalidOperationException($"Field cannot contain the quote character {c}");
+                            sb.Append(c);
                         }
                         sb.Append(c);
                     }
@@ -72,6 +76,7 @@ namespace AlphaCSV {
                 sb.Append('\r');
                 sb.Append('\n');
                 header = sb.ToString();
+                Console.WriteLine(sb.ToString());
                 sb.Clear();
             }
 
@@ -87,15 +92,20 @@ namespace AlphaCSV {
                     }
                     bool quoted = false;
 
+
+                    //If the field contains the file delimeter. We need to enclose it in quotes
+                    //however if now, the field contains both the delimeter and the quote then we
+                    //need to escape the quote.
                     if (field.IndexOf(options.Delimeter) >= 0 || options.QuoteFieldsWithoutDelimeter) {
                         sb.Append(options.QuoteCharacter);
                         quoted = true;
                     }
 
                     foreach (char c in field) {
+                        //If we are in a quoted field and we find a quote character inside the fields
+                        //we must escape it according to RFC4180 section 2 item 7.
                         if (c == options.QuoteCharacter && quoted) {
-                            //TODO: Decide if I want to escape the character
-                            throw new InvalidOperationException($"Field cannot contain the quote character {c}");
+                            sb.Append(c);
                         }
                         sb.Append(c);
                     }
@@ -113,6 +123,7 @@ namespace AlphaCSV {
                 sb.Append('\r');
                 sb.Append('\n');
                 lines.Add(sb.ToString());
+                Console.WriteLine(sb.ToString());
                 sb.Clear();
             }
 

@@ -214,6 +214,90 @@ namespace TestAlphaCSV {
             Assert.AreEqual(45, readBytes.Length);
         }
 
+        [TestMethod]
+        public void WriteCSV_WriteQuotedFieldThatContainsQuotes_ShouldEscapeTheQuote() {
+            //Arrange
+
+            DataTable table = new DataTable();
+
+            table.Columns.Add(new DataColumn("ColumnA", typeof(string)));
+            table.Columns.Add(new DataColumn("ColumnB", typeof(string)));
+
+            DataRow r = table.NewRow();
+            r[0] = "Hello";
+            r[1] = "W\"orld";
+
+            table.Rows.Add(r);
+
+            r = table.NewRow();
+            r[0] = "Hello2";
+            r[1] = "World2";
+
+            table.Rows.Add(r);
+            MockFileSystem fileSystem = new MockFileSystem();
+            CSVWriter writer = new CSVWriter(fileSystem);
+
+            //Default options will also write a CR and LF. This is two additional Bytes.
+            string line = "\"ColumnA\",\"ColumnB\""; //17
+            string line2 = "\"Hello\",\"W\"\"orld\""; //13
+            string line3 = "\"Hello2\",\"World2\""; //15
+            string[] expectedLines = { line, line2, line3 };
+
+            CSVWriteOptions opts =  new CSVWriteOptions();
+            opts.QuoteFieldsWithoutDelimeter = true;
+
+            //Act
+            writer.WriteCSV("test.csv", table, opts);
+
+
+            string[] readLines = fileSystem.File.ReadAllLines("test.csv");
+            //for(int i=0; i<readLines.Length; i++){
+            //    Console.WriteLine("Comparing {0} with {1}",readLines[i],expectedLines[i]);
+            //}
+            CollectionAssert.AreEqual(expectedLines, readLines);
+        }
+
+        [TestMethod]
+        public void WriteCSV_WriteFieldThatContainsBothDelimeterAndQuotes_ShouldEscapeTheQuote() {
+            //Arrange
+
+            DataTable table = new DataTable();
+
+            table.Columns.Add(new DataColumn("ColumnA", typeof(string)));
+            table.Columns.Add(new DataColumn("ColumnB", typeof(string)));
+
+            DataRow r = table.NewRow();
+            r[0] = "Hello";
+            r[1] = "W\"o,rld";
+
+            table.Rows.Add(r);
+
+            r = table.NewRow();
+            r[0] = "Hello2";
+            r[1] = "World2";
+
+            table.Rows.Add(r);
+            MockFileSystem fileSystem = new MockFileSystem();
+            CSVWriter writer = new CSVWriter(fileSystem);
+
+            //Default options will also write a CR and LF. This is two additional Bytes.
+            string line = "ColumnA,ColumnB"; //17
+            string line2 = "Hello,\"W\"\"o,rld\""; //13
+            string line3 = "Hello2,World2"; //15
+            string[] expectedLines = { line, line2, line3 };
+
+
+            //Act
+            writer.WriteCSV("test.csv", table);
+
+
+            string[] readLines = fileSystem.File.ReadAllLines("test.csv");
+            //for(int i=0; i<readLines.Length; i++){
+            //    Console.WriteLine("Comparing {0} with {1}",readLines[i],expectedLines[i]);
+            //}
+            CollectionAssert.AreEqual(expectedLines, readLines);
+        }
+
 
     }
 }
