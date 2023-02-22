@@ -76,7 +76,6 @@ namespace AlphaCSV {
                 sb.Append('\r');
                 sb.Append('\n');
                 header = sb.ToString();
-                Console.WriteLine(sb.ToString());
                 sb.Clear();
             }
 
@@ -123,7 +122,6 @@ namespace AlphaCSV {
                 sb.Append('\r');
                 sb.Append('\n');
                 lines.Add(sb.ToString());
-                Console.WriteLine(sb.ToString());
                 sb.Clear();
             }
 
