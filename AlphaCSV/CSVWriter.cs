@@ -50,7 +50,7 @@ namespace AlphaCSV {
                     //If the field contains the file delimeter. We need to enclose it in quotes
                     //however if now, the field contains both the delimeter and the quote then we
                     //need to escape the quote.
-                    if (colName.IndexOf(options.Delimeter) >= 0 || options.QuoteFieldsWithoutDelimeter) {
+                    if (colName.IndexOf(options.Delimeter) >= 0 || colName.IndexOf('"') >= 0 || options.QuoteFieldsWithoutDelimeter) {
                         sb.Append(options.QuoteCharacter);
                         quoted = true;
                     }
@@ -95,7 +95,7 @@ namespace AlphaCSV {
                     //If the field contains the file delimeter. We need to enclose it in quotes
                     //however if now, the field contains both the delimeter and the quote then we
                     //need to escape the quote.
-                    if (field.IndexOf(options.Delimeter) >= 0 || options.QuoteFieldsWithoutDelimeter) {
+                    if (field.IndexOf(options.Delimeter) >= 0 || field.IndexOf('"') >= 0 || options.QuoteFieldsWithoutDelimeter) {
                         sb.Append(options.QuoteCharacter);
                         quoted = true;
                     }
