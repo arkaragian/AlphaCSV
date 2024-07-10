@@ -12,14 +12,14 @@ namespace AlphaCSV {
     /// </summary>
     public class CSVWriter : ICSVWriter {
 
-        readonly IFileSystem FSInterface;
+        private readonly IFileSystem FSInterface;
 
         /// <summary>
         /// Constructor for dependency injection
         /// </summary>
         /// <param name="fileSystem"></param>
         public CSVWriter(IFileSystem fileSystem) {
-            this.FSInterface = fileSystem;
+            FSInterface = fileSystem;
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace AlphaCSV {
                 FSInterface.File.Delete(filename);
             }
             Stream fileStream = FSInterface.File.OpenWrite(filename);
-            StreamWriter writer = new StreamWriter(fileStream);
+            StreamWriter writer = new(fileStream, options.Encoding, bufferSize: -1, leaveOpen: false);
             if (header != null) {
                 writer.Write(header);
             }

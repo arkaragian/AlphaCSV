@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace AlphaCSV {
     public class CSVWriteOptions : BaseCSVOptions {
@@ -15,6 +13,14 @@ namespace AlphaCSV {
         /// </summary>
         public bool QuoteFieldsWithoutDelimeter { get; set; }
 
+        /// <summary>
+        /// Specifices the encoding of the file that is written.
+        /// </summary>
+        /// <remarks>
+        /// Default value is UTF8
+        /// </remarks>
+        public Encoding Encoding { get; init; }
+
         public CSVWriteOptions() {
             Delimeter = ',';
             QuoteCharacter = '"';
@@ -22,6 +28,7 @@ namespace AlphaCSV {
             WriteHeaders = true;
             DateTimeFormat = "dd-MMM-yyyy";
             DecimalSeperator = '.';
+            Encoding = Encoding.UTF8;
         }
     }
 }
