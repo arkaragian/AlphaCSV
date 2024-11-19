@@ -16,14 +16,14 @@ namespace AlphaCSV;
 /// </summary>
 public class CSVParser : ICSVParser {
 
-    readonly IFileSystem FSInterface;
+    private readonly IFileSystem FSInterface;
 
     /// <summary>
     /// Constructor with dependency injectio using file system abstractions.
     /// </summary>
     /// <param name="fileSystem"></param>
     public CSVParser(IFileSystem fileSystem) {
-        this.FSInterface = fileSystem;
+        FSInterface = fileSystem;
     }
 
     /// <summary>
@@ -48,14 +48,12 @@ public class CSVParser : ICSVParser {
         //https://stackoverflow.com/questions/27345854/read-only-first-line-from-a-text-file/27345927
         string FirstLine = FSInterface.File.ReadLines(path).First();
 
-        if (options == null) {
-            options = new CSVParseOptions();
-        }
+        options ??= new CSVParseOptions();
 
         string[] fields = ParseLine(FirstLine, options);
-        DataTable schema = new DataTable();
+        DataTable schema = new();
         foreach (string field in fields) {
-            DataColumn column = new DataColumn(field, typeof(string));
+            DataColumn column = new(field, typeof(string));
             schema.Columns.Add(column);
         }
 
@@ -74,9 +72,7 @@ public class CSVParser : ICSVParser {
     /// <returns>The contents of the CSV file inside a datatable</returns>
     public DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
         //Use the default options if the user does not provide them.
-        if (options == null) {
-            options = new CSVParseOptions();
-        }
+        options ??= new CSVParseOptions();
 
         //TODO: Do not read the complete file. Instead read one row at a time
         string[] lines = FSInterface.File.ReadAllLines(path);
@@ -114,7 +110,7 @@ public class CSVParser : ICSVParser {
                     //We need this to access the column name.
                     int index = 0;
                     foreach (string f in fields) {
-                        if (!f.Equals(schema.Columns[index].ColumnName)) {
+                        if (!f.Equals(schema.Columns[index].ColumnName, StringComparison.Ordinal)) {
                             throw GenerateInvalidOpException("Column Names do not match. Offending names are " + f + " and " + schema.Columns[index].ColumnName, options);
                         }
                         index++;
@@ -146,8 +142,7 @@ public class CSVParser : ICSVParser {
                         //If there are no options. Try a parsing. If there are options parse the stuff as needed.
                         //TODO: Log this with an ILogger
                         if (string.IsNullOrEmpty(options.DateTimeFormat)) {
-                            DateTime theDate;
-                            DateTime.TryParse(fields[i], out theDate);
+                            DateTime.TryParse(fields[i], out DateTime theDate);
                             r[i] = theDate;
                         } else {
                             r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
@@ -185,19 +180,19 @@ public class CSVParser : ICSVParser {
     /// <exception cref="InvalidOperationException"></exception>
     public List<T> ParseType<T>(string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
         Type genType = typeof(T);
-        ConstructorInfo constructor = genType.GetConstructor(new Type[] { });
+        ConstructorInfo constructor = genType.GetConstructor(Array.Empty<Type>());
         PropertyInfo[] properties = genType.GetProperties();
 
 
-        List<Type> propertyTypes = new List<Type>();
-        List<MethodInfo> propertySetMethods = new List<MethodInfo>();
-        List<string> propertNames = new List<string>();
+        List<Type> propertyTypes = new();
+        List<MethodInfo> propertySetMethods = new();
+        List<string> propertNames = new();
 
-        List<Tuple<Type, MethodInfo>> comprisingTypes = new List<Tuple<Type, MethodInfo>>();
+        List<Tuple<Type, MethodInfo>> comprisingTypes = new();
         foreach (PropertyInfo pi in properties) {
             if (pi.CanWrite) {
                 MethodInfo info = pi.GetSetMethod();
-                if (info != null) {
+                if (info is not null) {
                     propertyTypes.Add(pi.PropertyType);
                     propertySetMethods.Add(pi.GetSetMethod());
                     propertNames.Add(pi.Name);
@@ -211,7 +206,7 @@ public class CSVParser : ICSVParser {
             throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyTypes.Count}");
         }
 
-        List<T> result = new List<T>(table.Rows.Count);
+        List<T> result = new(table.Rows.Count);
         foreach (DataRow row in table.Rows) {
             object GenericInstance = constructor.Invoke(null);
             for (int i = 0; i < table.Columns.Count; i++) {
@@ -220,7 +215,7 @@ public class CSVParser : ICSVParser {
                 //Thus we need to read the file first and then correlate the column name to the field of the class that we
                 //need to instantiate.
                 int indexToUse = propertNames.IndexOf(name);
-                if (indexToUse == -1) {
+                if (indexToUse is -1) {
                     throw new InvalidOperationException($"There is no property with name {name}");
                 }
                 object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse]);
