@@ -188,7 +188,7 @@ namespace TestAlphaCSV {
             //Act
             writer.WriteCSV("test.csv", table,options);
 
-            //Assert
+            //Assert2
             string[] readLines = fileSystem.File.ReadAllLines("test.csv");
             CollectionAssert.AreEqual(expectedLines, readLines);
         }
@@ -201,9 +201,9 @@ namespace TestAlphaCSV {
             CSVWriter writer = new CSVWriter(fileSystem);
 
             //Default options will also write a CR and LF. This is two additional Bytes.
-            string line = "ColumnA,ColumnB"; //17
-            string line2 = "Hello,World"; //13
-            string line3 = "Hello2,World2"; //15
+            string line = "ColumnA,ColumnB"; // 15 + 2  = 17 Bytes
+            string line2 = "Hello,World";    // 11 + 2  = 13 Bytes
+            string line3 = "Hello2,World2";  // 13 + 2  = 15 Bytes
             string[] expectedLines = { line, line2, line3 };
 
             //Act
