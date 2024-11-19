@@ -52,7 +52,7 @@ namespace TestAlphaCSV {
         /// An IEnumerable method that returns all the ways that a record line can be terminated.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<string> LineTermination() {
+        public static IEnumerable<string?> LineTermination() {
             yield return null;
             yield return "\n";
             yield return "\r\n";
@@ -231,7 +231,7 @@ namespace TestAlphaCSV {
             StringBuilder fileBuilder = new StringBuilder();
             foreach (object[] data in Method) {
                 foreach (string headerTermination in HeaderTermination()) {
-                    foreach (string termination in LineTermination()) {
+                    foreach (string? termination in LineTermination()) {
                         fileBuilder.Clear();
                         int numberOfFields = ((object[])data[1]).Length; //Add the header
                         //For number of expected fields. Build a CSV input file.
@@ -350,9 +350,6 @@ namespace TestAlphaCSV {
             //Act
             CSVParser parser = new CSVParser(fs); //Inject dependency here
             //Since we have the expected result we just clone the schema instead of building it by hand.
-            if (input.Contains("404001286301")) {
-                int a = 5;
-            }
             DataTable table = parser.ParseDefinedCSV(expectedResult.Clone(), path, options);
 
             //Assert
@@ -360,7 +357,7 @@ namespace TestAlphaCSV {
         }
 
 
-#if false 
+#if false
         //This is a single debug method aiming to provide a scrapbook in order to debug a test.
         [TestMethod]
         public void DebugSingleCase() {

@@ -30,7 +30,7 @@ namespace TestAlphaCSV {
         ///     number is not equal to the number specified in the columns argument
         /// </exception>
         /// <returns></returns>
-        public DataTable GetSimpleStringTable(int rows, int columns, string[] headers = null) {
+        public DataTable GetSimpleStringTable(int rows, int columns, string[]? headers = null) {
             DataTable table = new DataTable();
 
             if (headers != null && headers.Length != columns) {

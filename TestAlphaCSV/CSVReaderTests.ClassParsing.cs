@@ -11,12 +11,12 @@ namespace TestAlphaCSV {
     public partial class CSVReaderTests {
 
         public record TestRecord {
-            public string Name { get; set; }
-            public string Surname { get; set; }
+            public required string Name { get; set; }
+            public required string Surname { get; set; }
         }
 
         public record DerivedRecord : TestRecord {
-            public string FatherName { get; set; }
+            public required string FatherName { get; set; }
         }
 
 
