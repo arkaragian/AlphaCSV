@@ -1,6 +1,11 @@
 # Remove the line below if you want to inherit .editorconfig settings from higher directories
 root = true
 
+[*]
+end_of_line = lf
+insert_final_newline = false
+
+
 # C# files
 [*.cs]
 
@@ -11,9 +16,6 @@ indent_size = 4
 indent_style = space
 tab_width = 4
 
-# New line preferences
-insert_final_newline = false
-
 trim_trailing_whitespace = true
 
 #### .NET Coding Conventions ####
@@ -22,6 +24,11 @@ trim_trailing_whitespace = true
 dotnet_separate_import_directive_groups = false
 dotnet_sort_system_directives_first = false
 file_header_template = unset
+
+# Namespace settings
+
+# The value here may either file_scoped or block_scoped
+csharp_style_namespace_declarations = file_scoped
 
 # this. and Me. preferences
 dotnet_style_qualification_for_event = false
@@ -43,7 +50,7 @@ dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity
 dotnet_style_require_accessibility_modifiers = for_non_interface_members
 
 # Expression-level preferences
-dotnet_style_coalesce_expression = true
+dotnet_style_coalesce_expression = false
 dotnet_style_collection_initializer = true
 dotnet_style_explicit_tuple_names = true
 dotnet_style_null_propagation = true
@@ -51,8 +58,9 @@ dotnet_style_object_initializer = true
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 dotnet_style_prefer_auto_properties = true
 dotnet_style_prefer_compound_assignment = true
-dotnet_style_prefer_conditional_expression_over_assignment = true
-dotnet_style_prefer_conditional_expression_over_return = true
+# Do not prefer
+dotnet_style_prefer_conditional_expression_over_assignment = false
+dotnet_style_prefer_conditional_expression_over_return = false
 dotnet_style_prefer_inferred_anonymous_type_member_names = true
 dotnet_style_prefer_inferred_tuple_names = true
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true
@@ -69,6 +77,9 @@ dotnet_code_quality_unused_parameters = all
 dotnet_remove_unnecessary_suppression_exclusions = none
 
 #### C# Coding Conventions ####
+
+# Top Level Statements
+csharp_style_prefer_top_level_statements=false
 
 # var preferences
 csharp_style_var_elsewhere = false
@@ -207,5 +218,30 @@ dotnet_naming_style.begins_with_i.required_suffix =
 dotnet_naming_style.begins_with_i.word_separator =
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
-# CS8604: Possible null reference argument.
-dotnet_diagnostic.CS8604.severity = silent
+
+## Custom Naming Rules for const string values ##
+# for example const string HELLO_WORLD = "Hello World!";
+# for example const string HELLO = "Hello World!";
+# should be correct
+#
+
+
+# Custom Naming Style for const string values to mimic C style #define formatting
+dotnet_naming_style.c_style_define.capitalization = all_upper
+dotnet_naming_style.c_style_define.required_prefix =
+dotnet_naming_style.c_style_define.required_suffix =
+dotnet_naming_style.c_style_define.word_separator = _
+
+# Symbol specification for const string fields
+dotnet_naming_symbols.const_string_fields.applicable_kinds = field, identifier
+dotnet_naming_symbols.const_string_fields.applicable_accessibilities = public, private, protected, internal
+dotnet_naming_symbols.const_string_fields.required_modifiers = const
+
+# Naming rule for const string fields to follow C style #define formatting
+dotnet_naming_rule.const_strings_c_style.severity = error
+dotnet_naming_rule.const_strings_c_style.symbols = const_string_fields
+dotnet_naming_rule.const_strings_c_style.style = c_style_define
+
+# CA1848 - Use the LoggerMessage delegates. Disable this. We know the high
+# performance of delegates.
+dotnet_diagnostic.CA1848.severity = none
