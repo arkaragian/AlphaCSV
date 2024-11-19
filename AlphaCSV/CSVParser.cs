@@ -256,7 +256,7 @@ namespace AlphaCSV {
                     //be dealing with an empty quoted field. Note the insideField flag is required only when we
                     //use a quote.
                     if (string.IsNullOrEmpty(currentField) && previous != options.QuoteCharacter) {
-                        insideField = true; 
+                        insideField = true;
                     } else {
                         //If we have a null field and the previous character is the quote character then we can assume that
                         //We have enciuntered a empty quoted field. Thus we change the state back to a "non inside field" state.
