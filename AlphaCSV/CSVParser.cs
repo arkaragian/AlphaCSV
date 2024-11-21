@@ -6,6 +6,7 @@ using AlphaCSV.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
@@ -142,8 +143,12 @@ public class CSVParser : ICSVParser {
                         //If there are no options. Try a parsing. If there are options parse the stuff as needed.
                         //TODO: Log this with an ILogger
                         if (string.IsNullOrEmpty(options.DateTimeFormat)) {
-                            DateTime.TryParse(fields[i], out DateTime theDate);
-                            r[i] = theDate;
+                            bool ok = DateTime.TryParse(fields[i], out DateTime theDate);
+                            if (ok) {
+                                r[i] = theDate;
+                            } else {
+                                r[i] = DateTime.MinValue;
+                            }
                         } else {
                             r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
                         }
@@ -156,10 +161,10 @@ public class CSVParser : ICSVParser {
                         if (options.DecimalSeperator != '.') {
                             fields[i] = fields[i].Replace(options.DecimalSeperator, '.');
                         }
-                        r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
+                        r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType, CultureInfo.InvariantCulture);
                         break;
                     default:
-                        r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType);
+                        r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType, CultureInfo.InvariantCulture);
                         break;
                 }
             }
@@ -200,6 +205,10 @@ public class CSVParser : ICSVParser {
             }
         }
 
+        for (int i = 0; i < propertNames.Count; i++) {
+            Console.WriteLine("Index: {0} Property: {1}", i, propertNames[0]);
+        }
+
         DataTable table = ParseSimpleCSV(path, options, validationPatterns);
 
         if (table.Columns.Count != propertyTypes.Count) {
@@ -216,10 +225,10 @@ public class CSVParser : ICSVParser {
                 //need to instantiate.
                 int indexToUse = propertNames.IndexOf(name);
                 if (indexToUse is -1) {
-                    throw new InvalidOperationException($"There is no property with name {name}");
+                    throw new InvalidOperationException($"There is no property with name \"{name}\" for type {nameof(T)}");
                 }
-                object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse]);
-                propertySetMethods[indexToUse].Invoke(GenericInstance, new object[] { covertedValue });
+                object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse], CultureInfo.InvariantCulture);
+                _ = propertySetMethods[indexToUse].Invoke(GenericInstance, parameters: new object[] { covertedValue });
             }
             result.Add((T)GenericInstance);
         }
@@ -234,8 +243,8 @@ public class CSVParser : ICSVParser {
     /// <param name="line">The line to be parsed</param>
     /// <param name="options">The parsing options</param>
     /// <returns>An array containing all the seperate fields that comprise the file.</returns>
-    private string[] ParseLine(string line, CSVParseOptions options) {
-        List<string> fields = new List<string>();
+    private static string[] ParseLine(string line, CSVParseOptions options) {
+        List<string> fields = new();
         //This is quite a simple implementation. We iterrate through each character and assign it to a field.
 
         bool insideField = false;
@@ -322,7 +331,7 @@ public class CSVParser : ICSVParser {
     /// <param name="validationPatterns">The validation parameters</param>
     /// <returns>An exception ready to the thrown from the program</returns>
     private static InvalidOperationException GenerateInvalidOpException(string message, CSVParseOptions options = null, List<string> validationPatterns = null) {
-        InvalidOperationException ex = new InvalidOperationException(message);
+        InvalidOperationException ex = new(message);
         if (options != null) {
             ex.Data.Add("CSVParserOptions", options);
         }
