@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data;
 
-namespace AlphaCSV.Interfaces {
-    public interface ICSVWriter {
-        void WriteCSV(string filename, DataTable data, CSVWriteOptions options = null);
-    }
+namespace AlphaCSV.Interfaces;
+
+public interface ICSVWriter {
+    void WriteCSV(string filename, DataTable data, CSVWriteOptions options = null);
 }
