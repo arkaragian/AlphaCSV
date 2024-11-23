@@ -2,6 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 
+using System.Text;
+
 namespace AlphaCSV;
 
 public class CSVParseOptions : BaseCSVOptions {
@@ -35,6 +37,11 @@ public class CSVParseOptions : BaseCSVOptions {
     /// </summary>
     public bool AllowEmptyLastField { get; set; }
 
+    /// <summary>
+    /// Indicates the file encoding that will be used to read the csv file
+    /// </summary>
+    public Encoding FileEncoding { get; set; }
+
     public CSVParseOptions() {
         Delimeter = ',';
         CommentCharacter = '#';
@@ -44,6 +51,7 @@ public class CSVParseOptions : BaseCSVOptions {
         DateTimeFormat = "";
         AllowEmptyLastField = true;
         DecimalSeperator = '.';
+        FileEncoding = new UTF8Encoding();
     }
 
 }

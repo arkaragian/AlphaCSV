@@ -35,7 +35,10 @@ public class CSVParser : ICSVParser {
 
     /// <summary>
     /// Parses a CSV file without a given schema.
-    /// <remarks>This method will assume that all the fields are of string type.</remarks>
+    /// <remarks>
+    ///     This method will assume that all the fields are of string type. And
+    ///     will store them as such.
+    /// </remarks>
     /// </summary>
     /// <param name="path">The path of the file that will be read</param>
     /// <param name="options">(Optional argument) The options of the file that will be read.</param>
@@ -45,11 +48,12 @@ public class CSVParser : ICSVParser {
         //Before we continue we need to make some assumptions for the file. e.g to know how many fields we need to parse.
         //Thus we read only the first line, deduce information there and try to move forward.
 
+        options ??= new CSVParseOptions();
+
         //File.ReadLines makes use of lazy evaluation and doesn't read the whole file into an array of lines first.
         //https://stackoverflow.com/questions/27345854/read-only-first-line-from-a-text-file/27345927
-        string FirstLine = FSInterface.File.ReadLines(path).First();
+        string FirstLine = FSInterface.File.ReadLines(path, options.FileEncoding).First();
 
-        options ??= new CSVParseOptions();
 
         string[] fields = ParseLine(FirstLine, options);
         DataTable schema = new();
@@ -76,14 +80,12 @@ public class CSVParser : ICSVParser {
         options ??= new CSVParseOptions();
 
         //TODO: Do not read the complete file. Instead read one row at a time
-        string[] lines = FSInterface.File.ReadAllLines(path);
+        string[] lines = FSInterface.File.ReadAllLines(path, options.FileEncoding);
         DataTable table = schema.Clone();
 
         if (options.ValidateFields) {
-            if (validationPatterns != null) {
-                if (validationPatterns.Count != schema.Columns.Count) {
-                    throw GenerateInvalidOpException("The number of validation patterns given do not match the number of columns in the file schema", options);
-                }
+            if (validationPatterns is not null && validationPatterns.Count != schema.Columns.Count) {
+                throw GenerateInvalidOpException("The number of validation patterns given do not match the number of columns in the file schema", options);
             } else {
                 throw GenerateInvalidOpException("Field validation was requested but no validation patterns were provided.", options);
             }
