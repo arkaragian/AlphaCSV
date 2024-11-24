@@ -207,10 +207,6 @@ public class CSVParser : ICSVParser {
             }
         }
 
-        for (int i = 0; i < propertNames.Count; i++) {
-            Console.WriteLine("Index: {0} Property: {1}", i, propertNames[0]);
-        }
-
         DataTable table = ParseSimpleCSV(path, options, validationPatterns);
 
         if (table.Columns.Count != propertyTypes.Count) {
