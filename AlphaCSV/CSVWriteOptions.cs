@@ -1,37 +1,26 @@
-﻿using System.Text;
-
-namespace AlphaCSV;
+﻿namespace AlphaCSV;
 
 /// <summary>
 /// Represents the options for a CSV writer
 /// </summary>
-public class CSVWriteOptions : BaseCSVOptions {
+public sealed class CSVWriteOptions {
+
+    /// <summary>
+    /// Defines common options that apply to both read and write operations
+    /// of CSV files.
+    /// </summary>
+    public CSVOptions CommonOptions { get; set; } = new CSVOptions() {
+        DateTimeFormat = "dd-MMM-yyyy"
+    };
 
     /// <summary>
     /// A flag that determines if the CSV header names should be written to the file.
     /// </summary>
-    public bool WriteHeaders { get; set; }
+    public bool WriteHeaders { get; set; } = true;
 
     /// <summary>
     /// A Flag that forces field quotation even if the field does not contain the delimeter.
     /// </summary>
     public bool QuoteFieldsWithoutDelimeter { get; set; }
 
-    /// <summary>
-    /// Specifices the encoding of the file that is written.
-    /// </summary>
-    /// <remarks>
-    /// Default value is UTF8
-    /// </remarks>
-    public Encoding Encoding { get; init; }
-
-    public CSVWriteOptions() {
-        Delimeter = ',';
-        QuoteCharacter = '"';
-        QuoteFieldsWithoutDelimeter = false;
-        WriteHeaders = true;
-        DateTimeFormat = "dd-MMM-yyyy";
-        DecimalSeperator = '.';
-        Encoding = Encoding.UTF8;
-    }
 }

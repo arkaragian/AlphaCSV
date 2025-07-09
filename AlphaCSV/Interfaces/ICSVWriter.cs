@@ -3,5 +3,5 @@
 namespace AlphaCSV.Interfaces;
 
 public interface ICSVWriter {
-    void WriteCSV(string filename, DataTable data, CSVWriteOptions options = null);
+    void WriteCSV(string filename, DataTable data, CSVWriteOptions? options = null);
 }

@@ -36,13 +36,11 @@ public class CSVWriter : ICSVWriter {
     /// <param name="data">The data to write</param>
     /// <param name="options">CSV Parsing options</param>
     /// <exception cref="InvalidOperationException"></exception>
-    public void WriteCSV(string filename, DataTable data, CSVWriteOptions options = null) {
-        if (options == null) {
-            options = new CSVWriteOptions();
-        }
+    public void WriteCSV(string filename, DataTable data, CSVWriteOptions? options = null) {
+        options ??= new CSVWriteOptions();
 
-        StringBuilder sb = new StringBuilder();
-        string header = null;
+        StringBuilder sb = new();
+        string? header = null;
         if (options.WriteHeaders) {
             for (int i = 0; i < data.Columns.Count; i++) {
                 string colName = data.Columns[i].ColumnName;
@@ -51,36 +49,36 @@ public class CSVWriter : ICSVWriter {
                 //If the field contains the file delimeter. We need to enclose it in quotes
                 //however if now, the field contains both the delimeter and the quote then we
                 //need to escape the quote.
-                if (colName.IndexOf(options.Delimeter) >= 0 || colName.IndexOf('"') >= 0 || options.QuoteFieldsWithoutDelimeter) {
-                    sb.Append(options.QuoteCharacter);
+                if (colName.Contains(options.CommonOptions.Delimeter) || colName.Contains('"') || options.QuoteFieldsWithoutDelimeter) {
+                    _ = sb.Append(options.CommonOptions.QuoteCharacter);
                     quoted = true;
                 }
 
                 foreach (char c in colName) {
                     //If we are in a quoted field and we find a quote character inside the fields
                     //we must escape it according to RFC4180 section 2 item 7.
-                    if (c == options.QuoteCharacter && quoted) {
-                        sb.Append(c);
+                    if (c == options.CommonOptions.QuoteCharacter && quoted) {
+                        _ = sb.Append(c);
                     }
-                    sb.Append(c);
+                    _ = sb.Append(c);
                 }
 
                 if (quoted) {
-                    sb.Append(options.QuoteCharacter);
+                    _ = sb.Append(options.CommonOptions.QuoteCharacter);
                     quoted = false;
                 }
 
                 if (i != data.Columns.Count - 1) {
-                    sb.Append(options.Delimeter);
+                    _ = sb.Append(options.CommonOptions.Delimeter);
                 }
             }
-            sb.Append('\r');
-            sb.Append('\n');
+            _ = sb.Append('\r');
+            _ = sb.Append('\n');
             header = sb.ToString();
-            sb.Clear();
+            _ = sb.Clear();
         }
 
-        List<string> lines = new List<string>();
+        List<string> lines = [];
 
         for (int i = 0; i < data.Rows.Count; i++) {
             for (int j = 0; j < data.Rows[i].ItemArray.Length; j++) {
@@ -96,28 +94,28 @@ public class CSVWriter : ICSVWriter {
                 //If the field contains the file delimeter. We need to enclose it in quotes
                 //however if now, the field contains both the delimeter and the quote then we
                 //need to escape the quote.
-                if (field.IndexOf(options.Delimeter) >= 0 || field.IndexOf('"') >= 0 || options.QuoteFieldsWithoutDelimeter) {
-                    sb.Append(options.QuoteCharacter);
+                if (field.IndexOf(options.CommonOptions.Delimeter) >= 0 || field.IndexOf('"') >= 0 || options.QuoteFieldsWithoutDelimeter) {
+                    sb.Append(options.CommonOptions.QuoteCharacter);
                     quoted = true;
                 }
 
                 foreach (char c in field) {
                     //If we are in a quoted field and we find a quote character inside the fields
                     //we must escape it according to RFC4180 section 2 item 7.
-                    if (c == options.QuoteCharacter && quoted) {
+                    if (c == options.CommonOptions.QuoteCharacter && quoted) {
                         sb.Append(c);
                     }
                     sb.Append(c);
                 }
 
                 if (quoted) {
-                    sb.Append(options.QuoteCharacter);
+                    sb.Append(options.CommonOptions.QuoteCharacter);
                     quoted = false;
                 }
 
 
                 if (j != data.Rows[i].ItemArray.Length - 1) {
-                    sb.Append(options.Delimeter);
+                    sb.Append(options.CommonOptions.Delimeter);
                 }
             }
             sb.Append('\r');
@@ -132,7 +130,7 @@ public class CSVWriter : ICSVWriter {
             FSInterface.File.Delete(filename);
         }
         Stream fileStream = FSInterface.File.OpenWrite(filename);
-        StreamWriter writer = new(fileStream, options.Encoding, bufferSize: -1, leaveOpen: false);
+        StreamWriter writer = new(fileStream, options.CommonOptions.FileEncoding, bufferSize: -1, leaveOpen: false);
         if (header != null) {
             writer.Write(header);
         }
