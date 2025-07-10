@@ -275,7 +275,11 @@ public class CSVParser : ICSVParser {
                 previous = c;
                 //The delimeter could be the last character of the line. Check that and add the field to the list
                 if (i == line.Length - 1) {
-                    fields.Add(currentField);
+                    if (options.TrimFields) {
+                        fields.Add(currentField.Trim());
+                    } else {
+                        fields.Add(currentField);
+                    }
                     previous = c;
                 }
                 //continue;
@@ -285,7 +289,11 @@ public class CSVParser : ICSVParser {
                     //Otherwise we need to add the computed field to our list and prepare to calculate the next field.
                     currentField += c;
                 } else {
-                    fields.Add(currentField);
+                    if (options.TrimFields) {
+                        fields.Add(currentField.Trim());
+                    } else {
+                        fields.Add(currentField);
+                    }
                     previous = c;
                     currentField = "";
                     //Now we have now reset our state and we are ready to move on.
@@ -302,11 +310,19 @@ public class CSVParser : ICSVParser {
                     //We have reached the end of the line add whatever field we have to the list of fields
                     if (string.IsNullOrEmpty(currentField)) {
                         if (options.AllowEmptyLastField) {
-                            fields.Add(currentField);
+                            if (options.TrimFields) {
+                                fields.Add(currentField.Trim());
+                            } else {
+                                fields.Add(currentField);
+                            }
                             previous = c;
                         }
                     } else {
-                        fields.Add(currentField);
+                        if (options.TrimFields) {
+                            fields.Add(currentField.Trim());
+                        } else {
+                            fields.Add(currentField);
+                        }
                         previous = c;
                     }
                 }
@@ -314,7 +330,11 @@ public class CSVParser : ICSVParser {
                 currentField += c;
                 //This means that we are at the end of the line Though the line is not \n terminated. Add whatever field is computed.
                 if (i == line.Length - 1) {
-                    fields.Add(currentField);
+                    if (options.TrimFields) {
+                        fields.Add(currentField.Trim());
+                    } else {
+                        fields.Add(currentField);
+                    }
                     previous = c;
                 }
             }

@@ -35,6 +35,12 @@ public class CSVParseOptions {
     public bool ValidateFields { get; set; }
 
     /// <summary>
+    /// Inidcates if any whitespace will be trimmed from the front and back side
+    /// of all fields
+    /// </summary>
+    public bool TrimFields { get; set; }
+
+    /// <summary>
     /// Indicates wether the last field of the file lines can be empty. (eg when
     /// there is no data on the last field).
     /// </summary>
