@@ -211,7 +211,13 @@ public class CSVParser : ICSVParser {
                 if (info is not null) {
                     propertyTypes.Add(pi.PropertyType);
                     propertySetMethods.Add(pi.GetSetMethod());
-                    propertNames.Add(pi.Name);
+
+                    CSVFieldNameAttribute? attr = pi.GetCustomAttribute<CSVFieldNameAttribute>();
+                    if (attr is null) {
+                        propertNames.Add(pi.Name);
+                    } else {
+                        propertNames.Add(attr.FieldName);
+                    }
                 }
             }
         }
@@ -234,8 +240,11 @@ public class CSVParser : ICSVParser {
                 if (indexToUse is -1) {
                     throw new InvalidOperationException($"There is no property with name \"{name}\" for type {nameof(T)}");
                 }
-                object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse], CultureInfo.InvariantCulture);
-                _ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, parameters: [covertedValue]);
+                //object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse], CultureInfo.InvariantCulture);
+                //_ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, parameters: [covertedValue]);
+
+                object? convertedValue = PropertyConverter.ConvertValue(row[i], propertyTypes[indexToUse]);
+                _ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, [convertedValue]);
             }
             result.Add((T)GenericInstance);
         }
