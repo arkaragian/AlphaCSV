@@ -44,7 +44,7 @@ public class CSVParser : ICSVParser {
     /// <param name="options">(Optional argument) The options of the file that will be read.</param>
     /// <param name="validationPatterns">(Optional Argument) Validation patterns in terms of regular expressions</param>
     /// <returns>The contents of a CSV file in the form of a datatable</returns>
-    public DataTable ParseSimpleCSV(string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
+    public DataTable ParseSimpleCSV(string path, CSVParseOptions? options = null, List<Func<string, bool>>? validationPatterns = null) {
         //Before we continue we need to make some assumptions for the file. e.g to know how many fields we need to parse.
         //Thus we read only the first line, deduce information there and try to move forward.
 
@@ -52,7 +52,7 @@ public class CSVParser : ICSVParser {
 
         //File.ReadLines makes use of lazy evaluation and doesn't read the whole file into an array of lines first.
         //https://stackoverflow.com/questions/27345854/read-only-first-line-from-a-text-file/27345927
-        string FirstLine = FSInterface.File.ReadLines(path, options.FileEncoding).First();
+        string FirstLine = FSInterface.File.ReadLines(path, options.CommonOptions.FileEncoding).First();
 
 
         string[] fields = ParseLine(FirstLine, options);
@@ -75,12 +75,12 @@ public class CSVParser : ICSVParser {
     /// <remarks>This argument will only be used if the relevant flag is enabled in the parse options.</remarks>
     /// </param>
     /// <returns>The contents of the CSV file inside a datatable</returns>
-    public DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
+    public DataTable ParseDefinedCSV(DataTable schema, string path, CSVParseOptions? options = null, List<Func<string, bool>>? validationPatterns = null) {
         //Use the default options if the user does not provide them.
         options ??= new CSVParseOptions();
 
         //TODO: Do not read the complete file. Instead read one row at a time
-        string[] lines = FSInterface.File.ReadAllLines(path, options.FileEncoding);
+        string[] lines = FSInterface.File.ReadAllLines(path, options.CommonOptions.FileEncoding);
         DataTable table = schema.Clone();
 
         if (options.ValidateFields) {
@@ -129,6 +129,9 @@ public class CSVParser : ICSVParser {
             }
 
             if (options.ValidateFields) {
+                if (validationPatterns is null) {
+                    throw new InvalidOperationException("Validate Field Option is defined but no Validation Patters are defined");
+                }
                 //Check that the file is correct
                 for (int i = 0; i < validationPatterns.Count; i++) {
                     bool correct = validationPatterns[i](fields[i]);
@@ -145,7 +148,7 @@ public class CSVParser : ICSVParser {
                     case "System.DateTime":
                         //If there are no options. Try a parsing. If there are options parse the stuff as needed.
                         //TODO: Log this with an ILogger
-                        if (string.IsNullOrEmpty(options.DateTimeFormat)) {
+                        if (string.IsNullOrEmpty(options.CommonOptions.DateTimeFormat)) {
                             bool ok = DateTime.TryParse(fields[i], out DateTime theDate);
                             if (ok) {
                                 r[i] = theDate;
@@ -153,7 +156,7 @@ public class CSVParser : ICSVParser {
                                 r[i] = DateTime.MinValue;
                             }
                         } else {
-                            r[i] = DateTime.ParseExact(fields[i], options.DateTimeFormat, null);
+                            r[i] = DateTime.ParseExact(fields[i], options.CommonOptions.DateTimeFormat, null);
                         }
                         break;
                     case "System.Double":
@@ -161,8 +164,8 @@ public class CSVParser : ICSVParser {
                     case "System.Single":
                         //TODO: This could be a performance bottleneck since we are potentially
                         //processing thousands of strings.
-                        if (options.DecimalSeperator != '.') {
-                            fields[i] = fields[i].Replace(options.DecimalSeperator, '.');
+                        if (options.CommonOptions.DecimalSeperator != '.') {
+                            fields[i] = fields[i].Replace(options.CommonOptions.DecimalSeperator, '.');
                         }
                         r[i] = Convert.ChangeType(fields[i], schema.Columns[i].DataType, CultureInfo.InvariantCulture);
                         break;
@@ -186,20 +189,25 @@ public class CSVParser : ICSVParser {
     /// <param name="validationPatterns">Validation Patterns</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public List<T> ParseType<T>(string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
+    public List<T> ParseType<T>(string path, CSVParseOptions? options = null, List<Func<string, bool>>? validationPatterns = null) {
         Type genType = typeof(T);
-        ConstructorInfo constructor = genType.GetConstructor([]);
+        ConstructorInfo? constructor = genType.GetConstructor([]);
+
+        if (constructor is null) {
+            throw new InvalidOperationException("Type does not have a constructor");
+        }
+
         PropertyInfo[] properties = genType.GetProperties();
 
 
         List<Type> propertyTypes = [];
-        List<MethodInfo> propertySetMethods = [];
+        List<MethodInfo?> propertySetMethods = [];
         List<string> propertNames = [];
 
         List<Tuple<Type, MethodInfo>> comprisingTypes = [];
         foreach (PropertyInfo pi in properties) {
             if (pi.CanWrite) {
-                MethodInfo info = pi.GetSetMethod();
+                MethodInfo? info = pi.GetSetMethod();
                 if (info is not null) {
                     propertyTypes.Add(pi.PropertyType);
                     propertySetMethods.Add(pi.GetSetMethod());
@@ -227,7 +235,7 @@ public class CSVParser : ICSVParser {
                     throw new InvalidOperationException($"There is no property with name \"{name}\" for type {nameof(T)}");
                 }
                 object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse], CultureInfo.InvariantCulture);
-                _ = propertySetMethods[indexToUse].Invoke(GenericInstance, parameters: [covertedValue]);
+                _ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, parameters: [covertedValue]);
             }
             result.Add((T)GenericInstance);
         }
@@ -243,7 +251,7 @@ public class CSVParser : ICSVParser {
     /// <param name="options">The parsing options</param>
     /// <returns>An array containing all the seperate fields that comprise the file.</returns>
     private static string[] ParseLine(string line, CSVParseOptions options) {
-        List<string> fields = new();
+        List<string> fields = [];
         //This is quite a simple implementation. We iterrate through each character and assign it to a field.
 
         bool insideField = false;
@@ -252,12 +260,12 @@ public class CSVParser : ICSVParser {
         for (int i = 0; i < line.Length; i++) {
             char c = line[i];
             //We hit a quote. This is either the start or the end of the field
-            if (c == options.QuoteCharacter) {
+            if (c == options.CommonOptions.QuoteCharacter) {
                 //If we are at the start of the field then the field is either empty or null.
                 //This is not a sufficient indicator if we are at the start of the field. Becasuse we might
                 //be dealing with an empty quoted field. Note the insideField flag is required only when we
                 //use a quote.
-                if (string.IsNullOrEmpty(currentField) && previous != options.QuoteCharacter) {
+                if (string.IsNullOrEmpty(currentField) && previous != options.CommonOptions.QuoteCharacter) {
                     insideField = true;
                 } else {
                     //If we have a null field and the previous character is the quote character then we can assume that
@@ -267,17 +275,25 @@ public class CSVParser : ICSVParser {
                 previous = c;
                 //The delimeter could be the last character of the line. Check that and add the field to the list
                 if (i == line.Length - 1) {
-                    fields.Add(currentField);
+                    if (options.TrimFields) {
+                        fields.Add(currentField.Trim());
+                    } else {
+                        fields.Add(currentField);
+                    }
                     previous = c;
                 }
                 //continue;
-            } else if (c == options.Delimeter) {
+            } else if (c == options.CommonOptions.Delimeter) {
                 if (insideField) {
                     //If the CSV is quoted. Then the delimeter we encounter here is part of the field value.
                     //Otherwise we need to add the computed field to our list and prepare to calculate the next field.
                     currentField += c;
                 } else {
-                    fields.Add(currentField);
+                    if (options.TrimFields) {
+                        fields.Add(currentField.Trim());
+                    } else {
+                        fields.Add(currentField);
+                    }
                     previous = c;
                     currentField = "";
                     //Now we have now reset our state and we are ready to move on.
@@ -294,11 +310,19 @@ public class CSVParser : ICSVParser {
                     //We have reached the end of the line add whatever field we have to the list of fields
                     if (string.IsNullOrEmpty(currentField)) {
                         if (options.AllowEmptyLastField) {
-                            fields.Add(currentField);
+                            if (options.TrimFields) {
+                                fields.Add(currentField.Trim());
+                            } else {
+                                fields.Add(currentField);
+                            }
                             previous = c;
                         }
                     } else {
-                        fields.Add(currentField);
+                        if (options.TrimFields) {
+                            fields.Add(currentField.Trim());
+                        } else {
+                            fields.Add(currentField);
+                        }
                         previous = c;
                     }
                 }
@@ -306,12 +330,16 @@ public class CSVParser : ICSVParser {
                 currentField += c;
                 //This means that we are at the end of the line Though the line is not \n terminated. Add whatever field is computed.
                 if (i == line.Length - 1) {
-                    fields.Add(currentField);
+                    if (options.TrimFields) {
+                        fields.Add(currentField.Trim());
+                    } else {
+                        fields.Add(currentField);
+                    }
                     previous = c;
                 }
             }
         }
-        return fields.ToArray();
+        return [.. fields];
     }
 
 
@@ -329,7 +357,7 @@ public class CSVParser : ICSVParser {
     /// <param name="options">The Parsing options</param>
     /// <param name="validationPatterns">The validation parameters</param>
     /// <returns>An exception ready to the thrown from the program</returns>
-    private static InvalidOperationException GenerateInvalidOpException(string message, CSVParseOptions options = null, List<string> validationPatterns = null) {
+    private static InvalidOperationException GenerateInvalidOpException(string message, CSVParseOptions? options = null, List<string>? validationPatterns = null) {
         InvalidOperationException ex = new(message);
         if (options != null) {
             ex.Data.Add("CSVParserOptions", options);

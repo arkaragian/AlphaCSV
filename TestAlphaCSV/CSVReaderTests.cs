@@ -175,7 +175,7 @@ namespace TestAlphaCSV {
             expectedFields = new object[] { 1156, "Hello", 1.45 };
             yield return new object[] { line, expectedFields, options };
 
-            options.DecimalSeperator = ',';
+            options.CommonOptions.DecimalSeperator = ',';
             line = "1156,Hello,\"1,45\"";
             expectedFields = new object[] { 1156, "Hello", 1.45 };
             yield return new object[] { line, expectedFields, options };
