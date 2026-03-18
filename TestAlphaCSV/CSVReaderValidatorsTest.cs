@@ -4,9 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestAlphaCSV {
     [TestClass]
@@ -15,14 +12,14 @@ namespace TestAlphaCSV {
         private DataTable expectedData {
             get {
                 DataTable table = new DataTable();
-                table.Columns.Add("ColumnString",typeof(string));
-                table.Columns.Add("ColumnInt",typeof(int));
-                table.Columns.Add("ColumnDate",typeof(DateTime));
+                table.Columns.Add("ColumnString", typeof(string));
+                table.Columns.Add("ColumnInt", typeof(int));
+                table.Columns.Add("ColumnDate", typeof(DateTime));
 
                 DataRow r = table.NewRow();
                 r[0] = "Hello";
                 r[1] = 1;
-                r[2] = new DateTime(2022,2,15);
+                r[2] = new DateTime(2022, 2, 15);
 
                 table.Rows.Add(r);
                 return table;
@@ -72,13 +69,12 @@ namespace TestAlphaCSV {
             CSVParser parser = new CSVParser(mockfs);
             CSVParseOptions options = new CSVParseOptions();
             options.ValidateFields = true;
-            DataTable result = parser.ParseDefinedCSV(expectedData.Clone(),"test.csv",options,validators);
-            AssertDataTable.AreEqual(expectedData,result);
+            DataTable result = parser.ParseDefinedCSV(expectedData.Clone(), "test.csv", options, validators);
+            AssertDataTable.AreEqual(expectedData, result);
         }
 
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void ParseWithValidatorsExpectError() {
             MockFileSystem mockfs = new MockFileSystem();
             Func<string, bool> Validatora = StringValidator;
@@ -93,7 +89,11 @@ namespace TestAlphaCSV {
             CSVParser parser = new CSVParser(mockfs);
             CSVParseOptions options = new CSVParseOptions();
             options.ValidateFields = true;
-            parser.ParseDefinedCSV(expectedData.Clone(),"test.csv",options,validators);
+
+            Assert.Throws<InvalidOperationException>(() => {
+                parser.ParseDefinedCSV(expectedData.Clone(), "test.csv", options, validators);
+            });
+            parser.ParseDefinedCSV(expectedData.Clone(), "test.csv", options, validators);
         }
     }
 }

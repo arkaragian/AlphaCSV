@@ -302,10 +302,10 @@ namespace TestAlphaCSV {
 
 
 
-        [DataTestMethod]
-        [DynamicData(nameof(SimpleInputGenerator), DynamicDataSourceType.Method)]
-        [DynamicData(nameof(QuotedInputGenerator), DynamicDataSourceType.Method)]
-        [DynamicData(nameof(QuotedSimpleMixInputGenerator), DynamicDataSourceType.Method)]
+        [TestMethod]
+        [DynamicData(nameof(SimpleInputGenerator))]
+        [DynamicData(nameof(QuotedInputGenerator))]
+        [DynamicData(nameof(QuotedSimpleMixInputGenerator))]
         public void TestSimpleParse(string input, DataTable expectedResult, CSVParseOptions options, TerminationType headerTermination, TerminationType lineTermination) {
             //Arrange
             Console.WriteLine($"Input:\n{input}\n");
@@ -324,11 +324,11 @@ namespace TestAlphaCSV {
             AssertDataTable.AreEqual(expectedResult, table);
         }
 
-        [DataTestMethod]
-        [DynamicData(nameof(SimpleInputGenerator), DynamicDataSourceType.Method)]
-        [DynamicData(nameof(QuotedInputGenerator), DynamicDataSourceType.Method)]
-        [DynamicData(nameof(QuotedSimpleMixInputGenerator), DynamicDataSourceType.Method)]
-        [DynamicData(nameof(MixedStringIntegersInputGenerator), DynamicDataSourceType.Method)]
+        [TestMethod]
+        [DynamicData(nameof(SimpleInputGenerator))]
+        [DynamicData(nameof(QuotedInputGenerator))]
+        [DynamicData(nameof(QuotedSimpleMixInputGenerator))]
+        [DynamicData(nameof(MixedStringIntegersInputGenerator))]
         public void TestDefinedParse(string input, DataTable expectedResult, CSVParseOptions options, TerminationType headerTermination, TerminationType lineTermination) {
             //Arrange
             Console.WriteLine($"Input:\n{input}\n");

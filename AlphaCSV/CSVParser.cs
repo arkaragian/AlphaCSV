@@ -84,10 +84,11 @@ public class CSVParser : ICSVParser {
         DataTable table = schema.Clone();
 
         if (options.ValidateFields) {
-            if (validationPatterns is not null && validationPatterns.Count != schema.Columns.Count) {
-                throw GenerateInvalidOpException("The number of validation patterns given do not match the number of columns in the file schema", options);
-            } else {
+            if (validationPatterns is null) {
                 throw GenerateInvalidOpException("Field validation was requested but no validation patterns were provided.", options);
+            }
+            if (validationPatterns.Count != schema.Columns.Count) {
+                throw GenerateInvalidOpException("The number of validation patterns given do not match the number of columns in the file schema", options);
             }
         }
         //Keep track of the current row for informational purposes.
@@ -187,15 +188,15 @@ public class CSVParser : ICSVParser {
     /// <exception cref="InvalidOperationException"></exception>
     public List<T> ParseType<T>(string path, CSVParseOptions options = null, List<Func<string, bool>> validationPatterns = null) {
         Type genType = typeof(T);
-        ConstructorInfo constructor = genType.GetConstructor(Array.Empty<Type>());
+        ConstructorInfo constructor = genType.GetConstructor([]);
         PropertyInfo[] properties = genType.GetProperties();
 
 
-        List<Type> propertyTypes = new();
-        List<MethodInfo> propertySetMethods = new();
-        List<string> propertNames = new();
+        List<Type> propertyTypes = [];
+        List<MethodInfo> propertySetMethods = [];
+        List<string> propertNames = [];
 
-        List<Tuple<Type, MethodInfo>> comprisingTypes = new();
+        List<Tuple<Type, MethodInfo>> comprisingTypes = [];
         foreach (PropertyInfo pi in properties) {
             if (pi.CanWrite) {
                 MethodInfo info = pi.GetSetMethod();
@@ -226,7 +227,7 @@ public class CSVParser : ICSVParser {
                     throw new InvalidOperationException($"There is no property with name \"{name}\" for type {nameof(T)}");
                 }
                 object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse], CultureInfo.InvariantCulture);
-                _ = propertySetMethods[indexToUse].Invoke(GenericInstance, parameters: new object[] { covertedValue });
+                _ = propertySetMethods[indexToUse].Invoke(GenericInstance, parameters: [covertedValue]);
             }
             result.Add((T)GenericInstance);
         }
