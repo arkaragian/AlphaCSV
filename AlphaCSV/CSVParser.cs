@@ -224,9 +224,9 @@ public class CSVParser : ICSVParser {
 
         DataTable table = ParseSimpleCSV(path, options, validationPatterns);
 
-        if (table.Columns.Count != propertyTypes.Count) {
-            throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyTypes.Count}");
-        }
+        //if (table.Columns.Count != propertyTypes.Count) {
+        //    throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyTypes.Count}");
+        //}
 
         List<T> result = new(table.Rows.Count);
         foreach (DataRow row in table.Rows) {
@@ -238,7 +238,8 @@ public class CSVParser : ICSVParser {
                 //need to instantiate.
                 int indexToUse = propertNames.IndexOf(name);
                 if (indexToUse is -1) {
-                    throw new InvalidOperationException($"There is no property with name \"{name}\" for type {nameof(T)}");
+                    continue;
+                    //throw new InvalidOperationException($"There is no property with name \"{name}\" for type {nameof(T)}");
                 }
                 //object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse], CultureInfo.InvariantCulture);
                 //_ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, parameters: [covertedValue]);
