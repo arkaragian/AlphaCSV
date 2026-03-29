@@ -12,7 +12,6 @@ public class CSVParseOptions {
     /// </summary>
     public CSVOptions CommonOptions { get; set; } = new CSVOptions();
 
-
     /// <summary>
     /// Determines the comment character. Lines starting with this character will be ignored.
     /// </summary>
@@ -51,4 +50,11 @@ public class CSVParseOptions {
     /// with the schema that is why it can controlled by this option.
     /// </remarks>
     public bool AllowEmptyLastField { get; set; } = true;
+
+    /// <summary>
+    /// Enforces collumn count. For example if <see cref="CSVParser.ParseType<T>"/> is
+    /// used then the number of columns in the CSV file MUST match the number of properties
+    /// in the type. This check also applies to <see cref="CSVParser.ParseDefinedCSV(System.Data.DataTable, string, CSVParseOptions?, System.Collections.Generic.List{System.Func{string, bool}}?)">
+    /// </summary>
+    public bool EnforceColumnCount { get; set;} = false;
 }

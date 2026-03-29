@@ -224,26 +224,23 @@ public class CSVParser : ICSVParser {
 
         DataTable table = ParseSimpleCSV(path, options, validationPatterns);
 
-        //if (table.Columns.Count != propertyTypes.Count) {
-        //    throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyTypes.Count}");
-        //}
+        if(options is not null && options.EnforceColumnCount && table.Columns.Count != propertyTypes.Count) {
+            throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyTypes.Count}");
+        }
 
         List<T> result = new(table.Rows.Count);
         foreach (DataRow row in table.Rows) {
             object GenericInstance = constructor.Invoke(null);
             for (int i = 0; i < table.Columns.Count; i++) {
                 string name = table.Columns[i].ColumnName;
-                //We cannot be sure that the CSV field order is correct especially when dealing with derived classes.
-                //Thus we need to read the file first and then correlate the column name to the field of the class that we
-                //need to instantiate.
+                //We cannot be sure that the CSV field order is correct, or even if the property field that we are trying to
+                //instantiate actually exists in the file. Especially when dealing with derived classes. Thus we need to read
+                //the file first and then correlate the column name to the field of the class that we need to instantiate. If
+                //we find nothing we just continue.
                 int indexToUse = propertNames.IndexOf(name);
                 if (indexToUse is -1) {
                     continue;
-                    //throw new InvalidOperationException($"There is no property with name \"{name}\" for type {nameof(T)}");
                 }
-                //object covertedValue = Convert.ChangeType(row[i], propertyTypes[indexToUse], CultureInfo.InvariantCulture);
-                //_ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, parameters: [covertedValue]);
-
                 object? convertedValue = PropertyConverter.ConvertValue(row[i], propertyTypes[indexToUse]);
                 _ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, [convertedValue]);
             }

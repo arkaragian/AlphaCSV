@@ -83,10 +83,11 @@ public class CSVWriter : ICSVWriter {
         for (int i = 0; i < data.Rows.Count; i++) {
             for (int j = 0; j < data.Rows[i].ItemArray.Length; j++) {
                 string field;
-                if (data.Rows[i].ItemArray[j] == null) {
+                object? obj = data.Rows[i].ItemArray[j];
+                if (obj is null) {
                     field = "";
                 } else {
-                    field = data.Rows[i].ItemArray[j].ToString();
+                    field = obj.ToString() ?? "";
                 }
                 bool quoted = false;
 
