@@ -11,7 +11,7 @@ namespace TestAlphaCSV {
 
         private DataTable expectedData {
             get {
-                DataTable table = new DataTable();
+                DataTable table = new();
                 table.Columns.Add("ColumnString", typeof(string));
                 table.Columns.Add("ColumnInt", typeof(int));
                 table.Columns.Add("ColumnDate", typeof(DateTime));
@@ -40,15 +40,15 @@ namespace TestAlphaCSV {
             }
         }
 
-        bool StringValidator(string input) {
+        bool StringValidatorAlwaysReturnTrue(string input) {
             return true;
         }
 
-        bool IntValidator(string input) {
+        bool IntValidatorCheckIfStringContainsOne(string input) {
             return input.Contains('1');
         }
 
-        bool DateValidator(string input) {
+        bool DateValidatorCheckIfStringStartsWithFifteen(string input) {
             return input.StartsWith("15");
         }
 
@@ -56,44 +56,45 @@ namespace TestAlphaCSV {
 
         [TestMethod]
         public void ParseWithValidators() {
-            MockFileSystem mockfs = new MockFileSystem();
-            Func<string, bool> Validatora = StringValidator;
-            Func<string, bool> Validatorb = IntValidator;
-            Func<string, bool> Validatorc = DateValidator;
-            List<Func<string, bool>> validators = new List<Func<string, bool>>() {
+            MockFileSystem mockfs = new();
+            Func<string, bool> Validatora = StringValidatorAlwaysReturnTrue;
+            Func<string, bool> Validatorb = IntValidatorCheckIfStringContainsOne;
+            Func<string, bool> Validatorc = DateValidatorCheckIfStringStartsWithFifteen;
+            List<Func<string, bool>> validators = [
                 Validatora,
                 Validatorb,
                 Validatorc
-            };
+            ];
             mockfs.AddFile("test.csv", new MockFileData(fileData));
-            CSVParser parser = new CSVParser(mockfs);
-            CSVParseOptions options = new CSVParseOptions();
-            options.ValidateFields = true;
+            CSVParser parser = new(mockfs);
+            CSVParseOptions options = new() {
+                ValidateFields = true
+            };
             DataTable result = parser.ParseDefinedCSV(expectedData.Clone(), "test.csv", options, validators);
             AssertDataTable.AreEqual(expectedData, result);
         }
 
 
         [TestMethod]
-        public void ParseWithValidatorsExpectError() {
-            MockFileSystem mockfs = new MockFileSystem();
-            Func<string, bool> Validatora = StringValidator;
-            Func<string, bool> Validatorb = IntValidator;
-            Func<string, bool> Validatorc = DateValidator;
-            List<Func<string, bool>> validators = new List<Func<string, bool>>() {
+        public void ParseDefinedCSV_FieldFailsValidation_ThrowsInvalidOperationException() {
+            MockFileSystem mockfs = new();
+            Func<string, bool> Validatora = StringValidatorAlwaysReturnTrue;
+            Func<string, bool> Validatorb = IntValidatorCheckIfStringContainsOne;
+            Func<string, bool> Validatorc = DateValidatorCheckIfStringStartsWithFifteen;
+            List<Func<string, bool>> validators = [
                 Validatora,
                 Validatorb,
                 Validatorc
-            };
+            ];
             mockfs.AddFile("test.csv", new MockFileData(BadfileData));
-            CSVParser parser = new CSVParser(mockfs);
-            CSVParseOptions options = new CSVParseOptions();
-            options.ValidateFields = true;
+            CSVParser parser = new(mockfs);
+            CSVParseOptions options = new() {
+                ValidateFields = true
+            };
 
-            Assert.Throws<InvalidOperationException>(() => {
+            _ = Assert.ThrowsExactly<InvalidOperationException>(() => {
                 parser.ParseDefinedCSV(expectedData.Clone(), "test.csv", options, validators);
             });
-            parser.ParseDefinedCSV(expectedData.Clone(), "test.csv", options, validators);
         }
     }
 }
