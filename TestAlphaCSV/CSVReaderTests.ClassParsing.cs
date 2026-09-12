@@ -19,6 +19,17 @@ namespace TestAlphaCSV {
             public required string FatherName { get; set; }
         }
 
+        public sealed record CustomerPartCrossReference {
+            public required string PartNumber { get; init; }
+            public required CustomerPartReference CustomerReference { get; init; }
+        }
+
+        public sealed record CustomerPartReference {
+            public required string CustomerID { get; init; }
+            public required string CustomerPartNumber { get; init; }
+            public string? CustomerPartDescription { get; init; }
+        }
+
 
 
         [TestMethod]
@@ -101,6 +112,33 @@ namespace TestAlphaCSV {
 
             //Assert
             CollectionAssert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void TestNestedClassParsing() {
+            string input = "PartNumber,CustomerReference.CustomerID,CustomerReference.CustomerPartNumber,CustomerReference.CustomerPartDescription\nPART-001,CUST-42,CUSTOM-ABC,Replacement filter\n";
+
+            MockFileSystem fs = new MockFileSystem();
+            MockFileData mockInputFile = new MockFileData(input);
+            string path = @"C:\test.csv";
+            fs.AddFile(path, mockInputFile);
+
+            CustomerPartCrossReference expected = new CustomerPartCrossReference {
+                PartNumber = "PART-001",
+                CustomerReference = new CustomerPartReference {
+                    CustomerID = "CUST-42",
+                    CustomerPartNumber = "CUSTOM-ABC",
+                    CustomerPartDescription = "Replacement filter"
+                }
+            };
+
+            CSVParser parser = new CSVParser(fs);
+            CSVParseOptions options = new CSVParseOptions {
+                EnforceColumnCount = true
+            };
+            List<CustomerPartCrossReference> actual = parser.ParseType<CustomerPartCrossReference>(path, options);
+
+            CollectionAssert.AreEqual(new List<CustomerPartCrossReference> { expected }, actual);
         }
     }
 }

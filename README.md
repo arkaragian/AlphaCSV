@@ -131,6 +131,15 @@ Doe,John
 Doe,Jane
 ```
 
+Nested types are represented by dot-separated property paths. For example, a `CustomerReference` property containing
+`CustomerID` and `CustomerPartNumber` properties can be parsed from:
+```
+PartNumber,CustomerReference.CustomerID,CustomerReference.CustomerPartNumber
+PART-001,CUST-42,CUSTOM-ABC
+```
+Nested types must have a public parameterless constructor and public settable properties. The parser creates a nested
+instance when a matching field is encountered. `CSVFieldNameAttribute` values are used for each segment of the path.
+
 ## The `CSVParseOptions` Class
 This class controls the behavior of the `CSVParser` class and may be passed to the parser's methods as an optional argument.
 

@@ -3,6 +3,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 using AlphaCSV.Interfaces;
+using AlphaCSV.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -190,42 +191,19 @@ public class CSVParser : ICSVParser {
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     public List<T> ParseType<T>(string path, CSVParseOptions? options = null, List<Func<string, bool>>? validationPatterns = null) {
-        Type genType = typeof(T);
-        ConstructorInfo? constructor = genType.GetConstructor([]);
+        Type genericType = typeof(T);
+        ConstructorInfo? constructor = genericType.GetConstructor([]);
 
         if (constructor is null) {
             throw new InvalidOperationException("Type does not have a constructor");
         }
 
-        PropertyInfo[] properties = genType.GetProperties();
-
-
-        List<Type> propertyTypes = [];
-        List<MethodInfo?> propertySetMethods = [];
-        List<string> propertNames = [];
-
-        List<Tuple<Type, MethodInfo>> comprisingTypes = [];
-        foreach (PropertyInfo pi in properties) {
-            if (pi.CanWrite) {
-                MethodInfo? info = pi.GetSetMethod();
-                if (info is not null) {
-                    propertyTypes.Add(pi.PropertyType);
-                    propertySetMethods.Add(pi.GetSetMethod());
-
-                    CSVFieldNameAttribute? attr = pi.GetCustomAttribute<CSVFieldNameAttribute>();
-                    if (attr is null) {
-                        propertNames.Add(pi.Name);
-                    } else {
-                        propertNames.Add(attr.FieldName);
-                    }
-                }
-            }
-        }
+        List<PropertyBinding> propertyBindings = GetPropertyBindings(genericType);
 
         DataTable table = ParseSimpleCSV(path, options, validationPatterns);
 
-        if(options is not null && options.EnforceColumnCount && table.Columns.Count != propertyTypes.Count) {
-            throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyTypes.Count}");
+        if (options is not null && options.EnforceColumnCount && table.Columns.Count != propertyBindings.Count) {
+            throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of Type properties {propertyBindings.Count}");
         }
 
         List<T> result = new(table.Rows.Count);
@@ -237,12 +215,12 @@ public class CSVParser : ICSVParser {
                 //instantiate actually exists in the file. Especially when dealing with derived classes. Thus we need to read
                 //the file first and then correlate the column name to the field of the class that we need to instantiate. If
                 //we find nothing we just continue.
-                int indexToUse = propertNames.IndexOf(name);
-                if (indexToUse is -1) {
+                PropertyBinding? propertyBinding = propertyBindings.Find(binding => binding.Name == name);
+                if (propertyBinding is null) {
                     continue;
                 }
-                object? convertedValue = PropertyConverter.ConvertValue(row[i], propertyTypes[indexToUse]);
-                _ = propertySetMethods[indexToUse]?.Invoke(GenericInstance, [convertedValue]);
+                object? convertedValue = PropertyConverter.ConvertValue(row[i], propertyBinding.PropertyType);
+                propertyBinding.SetValue(GenericInstance, convertedValue);
             }
             result.Add((T)GenericInstance);
         }
@@ -250,6 +228,73 @@ public class CSVParser : ICSVParser {
         return result;
 
     }
+
+    /// <summary>
+    /// Creates the CSV field bindings for all writable leaf properties of the specified type.
+    /// </summary>
+    /// <param name="type">The root type whose properties will be mapped to CSV fields.</param>
+    /// <returns>
+    /// A list of bindings whose names use dot-separated paths for nested properties.
+    /// </returns>
+    private static List<PropertyBinding> GetPropertyBindings(Type type) {
+        List<PropertyBinding> bindings = [];
+        GetPropertyBindings(type, prefix: null, [], bindings, [type]);
+        return bindings;
+    }
+
+    /// <summary>
+    /// Recursively discovers writable leaf properties and adds their CSV field bindings.
+    /// </summary>
+    /// <param name="type">The type currently being inspected.</param>
+    /// <param name="prefix">The dot-separated CSV field path accumulated from parent properties.</param>
+    /// <param name="propertyPath">The property chain accumulated from the root type.</param>
+    /// <param name="bindings">The collection to which discovered leaf-property bindings are added.</param>
+    /// <param name="ancestors">The types in the current property path, used to detect recursive type cycles.</param>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when a nested property introduces a cycle in the object graph.
+    /// </exception>
+    private static void GetPropertyBindings(Type type, string? prefix, List<PropertyInfo> propertyPath, List<PropertyBinding> bindings, HashSet<Type> ancestors) {
+        foreach (PropertyInfo property in type.GetProperties()) {
+            MethodInfo? setMethod = property.GetSetMethod();
+            if (!property.CanWrite || setMethod is null) {
+                continue;
+            }
+
+            CSVFieldNameAttribute? attribute = property.GetCustomAttribute<CSVFieldNameAttribute>();
+            string propertyName = attribute?.FieldName ?? property.Name;
+            string fieldName = prefix is null ? propertyName : $"{prefix}.{propertyName}";
+            List<PropertyInfo> currentPath = [.. propertyPath, property];
+
+            if (!IsNestedType(property.PropertyType)) {
+                bindings.Add(new PropertyBinding(fieldName, property.PropertyType, currentPath));
+                continue;
+            }
+
+            if (!ancestors.Add(property.PropertyType)) {
+                throw new InvalidOperationException($"A nested property cycle was found at {fieldName}");
+            }
+
+            GetPropertyBindings(property.PropertyType, fieldName, currentPath, bindings, ancestors);
+            _ = ancestors.Remove(property.PropertyType);
+        }
+    }
+
+    /// <summary>
+    /// Determines whether a property type can be traversed as a nested CSV object.
+    /// </summary>
+    /// <param name="type">The property type to inspect.</param>
+    /// <returns>
+    /// <see langword="true"/> when the type is a non-string reference type with a public
+    /// parameterless constructor and at least one public writable property; otherwise,
+    /// <see langword="false"/>.
+    /// </returns>
+    private static bool IsNestedType(Type type) {
+        return type != typeof(string)
+            && type.IsClass
+            && type.GetConstructor([]) is not null
+            && type.GetProperties().Any(property => property.CanWrite && property.GetSetMethod() is not null);
+    }
+
 
     /// <summary>
     /// Parses a line and returns all the fields comprising this line.
