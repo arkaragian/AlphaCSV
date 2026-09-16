@@ -6,7 +6,9 @@
 using AlphaCSV;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO.Abstractions.TestingHelpers;
 
 namespace TestAlphaCSV {
     [TestClass]
@@ -38,6 +40,68 @@ namespace TestAlphaCSV {
 
             // Assert
             Assert.AreEqual("Name,Count\n", result);
+        }
+
+        [TestMethod]
+        public void WriteType_OutputIsParsedAgain_PreservesObjects() {
+            // Arrange
+            List<RoundTripModel> expected = new() {
+                new RoundTripModel() {
+                    Name = "Alpha,Beta",
+                    Quantity = 12,
+                    Enabled = true,
+                    Price = 1234.5m,
+                    Created = new DateTime(year: 2024, month: 2, day: 3, hour: 4, minute: 5, second: 6),
+                    State = RoundTripState.Active
+                },
+                new RoundTripModel() {
+                    Name = "Gamma",
+                    Quantity = -3,
+                    Enabled = false,
+                    Price = 0.25m,
+                    Created = new DateTime(year: 2025, month: 6, day: 7, hour: 8, minute: 9, second: 10),
+                    State = RoundTripState.Archived
+                }
+            };
+            CSVWriteOptions writeOptions = CreateWriteOptions();
+            CSVParseOptions parseOptions = CreateParseOptions();
+            MockFileSystem fileSystem = new();
+
+            // Act
+            string csv = CSVWriter.WriteType(expected, writeOptions);
+            fileSystem.AddFile(ROUND_TRIP_PATH, new MockFileData(csv));
+            CSVParser reader = new(fileSystem);
+            List<RoundTripModel> actual = reader.ParseType<RoundTripModel>(ROUND_TRIP_PATH, parseOptions);
+
+            // Assert
+            CollectionAssert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void WriteTypeLine_OutputIsParsedAgain_PreservesObject() {
+            // Arrange
+            RoundTripModel expected = new() {
+                Name = "Alpha,Beta",
+                Quantity = 12,
+                Enabled = true,
+                Price = 1234.5m,
+                Created = new DateTime(year: 2024, month: 2, day: 3, hour: 4, minute: 5, second: 6),
+                State = RoundTripState.Active
+            };
+            CSVWriteOptions writeOptions = CreateWriteOptions();
+            CSVParseOptions parseOptions = CreateParseOptions();
+            MockFileSystem fileSystem = new();
+
+            // Act
+            string line = CSVWriter.WriteTypeLine(expected, writeOptions);
+            string csv = $"Name,Quantity,Enabled,Price,Created,State\n{line}\n";
+            fileSystem.AddFile(ROUND_TRIP_PATH, new MockFileData(csv));
+            CSVParser reader = new(fileSystem);
+            List<RoundTripModel> actual = reader.ParseType<RoundTripModel>(ROUND_TRIP_PATH, parseOptions);
+
+            // Assert
+            Assert.HasCount(1, actual);
+            Assert.AreEqual(expected, actual[0]);
         }
 
         [TestMethod]
@@ -114,6 +178,43 @@ namespace TestAlphaCSV {
 
         private sealed class EscapedModel {
             public string Value { get; set; } = string.Empty;
+        }
+
+        public sealed record RoundTripModel {
+            public string Name { get; set; } = string.Empty;
+
+            public int Quantity { get; set; }
+
+            public bool Enabled { get; set; }
+
+            public decimal Price { get; set; }
+
+            public DateTime Created { get; set; }
+
+            public RoundTripState State { get; set; }
+        }
+
+        public enum RoundTripState {
+            Active,
+            Archived
+        }
+
+        private const string ROUND_TRIP_PATH = @"C:\round-trip.csv";
+
+        private static CSVWriteOptions CreateWriteOptions() {
+            return new CSVWriteOptions() {
+                CommonOptions = new CSVOptions() {
+                    DateTimeFormat = "yyyy-MM-dd HH:mm:ss"
+                }
+            };
+        }
+
+        private static CSVParseOptions CreateParseOptions() {
+            return new CSVParseOptions() {
+                CommonOptions = new CSVOptions() {
+                    DateTimeFormat = "yyyy-MM-dd HH:mm:ss"
+                }
+            };
         }
 
 #pragma warning restore CA1707
