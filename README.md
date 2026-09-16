@@ -1,11 +1,11 @@
 # AlphaCSV
-A small netstandard2.0 library that reads and writes CSV files. The goal of this
+A small .NET 10 library that reads and writes CSV files. The goal of this
 library is to help anyone who makes small automation or migration projects. It can
 however be used in larger projects.
 
-In general the library is designed to import the CSV into a datatable from there the
-one can use the datatable however he likse. Each column of the datatable can have different 
-types which can be described in a datatable schema.
+In general the library is designed to import CSV data into a `DataTable`, which can then
+be used as needed. Each column of the `DataTable` can have a different type which can be
+described in a `DataTable` schema.
 
 This library can also parse CSV files into `List<T>` where `T` is user defined classes or
 records provided that those types:
@@ -139,6 +139,79 @@ PART-001,CUST-42,CUSTOM-ABC
 ```
 Nested types must have a public parameterless constructor and public settable properties. The parser creates a nested
 instance when a matching field is encountered. `CSVFieldNameAttribute` values are used for each segment of the path.
+
+### Writing custom types with `WriteType<T>`
+
+`CSVWriter.WriteType` serializes an `IEnumerable<T>` to a CSV string. Public readable properties become the header
+fields, and each object becomes a data row.
+
+```csharp
+List<Person> persons = new List<Person>() {
+    new Person {
+        Name = "John",
+        Surname = "Doe"
+    },
+    new Person {
+        Name = "Jane",
+        Surname = "Doe"
+    }
+};
+
+string csv = CSVWriter.WriteType(persons, options: null);
+File.WriteAllText(filepath, csv);
+```
+
+The resulting file is:
+
+```csv
+Name,Surname
+John,Doe
+Jane,Doe
+```
+
+Fields containing commas, quotes, carriage returns, or line feeds are quoted, and quotes inside fields are escaped.
+`WriteType` includes the header and appends a line feed after every row.
+
+### Writing one row with `WriteTypeLine<T>`
+
+`CSVWriter.WriteTypeLine` serializes one object without a header or terminating line feed. This is useful when the
+caller manages the header or output stream separately.
+
+```csharp
+Person person = new Person {
+    Name = "John",
+    Surname = "Doe"
+};
+
+string line = CSVWriter.WriteTypeLine(person, options: null);
+// John,Doe
+```
+
+### Writing and reading a custom type
+
+A type can be written with `CSVWriter` and reconstructed with `CSVParser.ParseType<T>`. For a complete round trip,
+the type must have a public parameterless constructor and properties with both public getters and public setters.
+
+```csharp
+List<Person> original = new List<Person>() {
+    new Person {
+        Name = "John",
+        Surname = "Doe"
+    },
+    new Person {
+        Name = "Jane",
+        Surname = "Doe"
+    }
+};
+
+string csv = CSVWriter.WriteType(original, options: null);
+File.WriteAllText(filepath, csv);
+
+CSVParser parser = new CSVParser();
+List<Person> restored = parser.ParseType<Person>(filepath);
+```
+
+`restored` contains objects with the same property values as `original`.
 
 ## The `CSVParseOptions` Class
 This class controls the behavior of the `CSVParser` class and may be passed to the parser's methods as an optional argument.
