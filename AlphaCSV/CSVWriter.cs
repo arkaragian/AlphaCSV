@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Reflection;
@@ -143,6 +144,42 @@ public class CSVWriter : ICSVWriter {
         writer.Close();
     }
 
+    public static string WriteType<T>(IEnumerable<T> input, CSVWriteOptions? options) {
+        options ??= new CSVWriteOptions();
+
+        Type genType = typeof(T);
+
+        PropertyInfo[] properties = genType.GetProperties();
+
+        List<string> strValues = [];
+
+        foreach (PropertyInfo pi in properties) {
+
+            MethodInfo? getter = pi.GetMethod;
+
+            if (getter is null) {
+                continue;
+            }
+
+            if (!getter.IsPublic) {
+                continue;
+            }
+
+            strValues.Add(pi.Name);
+        }
+
+        StringBuilder builder = new();
+
+        builder.Append(string.Join(",", strValues)).Append('\n');
+
+        foreach(T i in input) {
+            builder.Append(WriteTypeLine(i, options)).Append('\n');
+        }
+
+        return builder.ToString();
+
+    }
+
     /// <summary>
     ///     Parses a CSV file containing values for the public set properties of
     ///     the specified type
@@ -159,17 +196,15 @@ public class CSVWriter : ICSVWriter {
     /// <param name="validationPatterns">Validation Patterns</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static string WriteType<T>(T input) {
+    public static string WriteTypeLine<T>(T input, CSVWriteOptions? options) {
+        options ??= new CSVWriteOptions();
+
         Type genType = typeof(T);
 
         PropertyInfo[] properties = genType.GetProperties();
 
+        List<string> strValues = [];
 
-        List<Type> propertyTypes = [];
-        List<MethodInfo?> propertySetMethods = [];
-        List<string> propertNames = [];
-
-        List<Tuple<Type, MethodInfo>> comprisingTypes = [];
         foreach (PropertyInfo pi in properties) {
 
             MethodInfo? getter = pi.GetMethod;
@@ -186,19 +221,32 @@ public class CSVWriter : ICSVWriter {
             object? val = getter.Invoke(input, parameters: null);
 
             if (val is null) {
+                strValues.Add("");
                 continue;
             }
 
-            propertyTypes.Add(pi.PropertyType);
-            propertySetMethods.Add(pi.GetSetMethod());
+            string text = val switch {
+                bool b => b ? "true" : "false",
+                DateTime dt => dt.ToString(options.CommonOptions.DateTimeFormat, CultureInfo.InvariantCulture),
+                IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
+                _ => val.ToString() ?? ""
+            };
 
-            CSVFieldNameAttribute? attr = pi.GetCustomAttribute<CSVFieldNameAttribute>();
-            if (attr is null) {
-                propertNames.Add(pi.Name);
-            } else {
-                propertNames.Add(attr.FieldName);
+            //Maybe quote the value
+            if (text.Contains('"')) {
+                text = text.Replace("\"", "\"\"");
             }
+
+            //Maybe quote the entire field.
+            if (text.Contains(',') || text.Contains('"') || text.Contains('\r') || text.Contains('\n')) {
+                text = $"\"{text}\"";
+            }
+
+            strValues.Add(text);
+
         }
+
+        return string.Join(",", strValues);
 
     }
 }
