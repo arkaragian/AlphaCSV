@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.IO.Abstractions;
+using System.Reflection;
 using System.Text;
 
 namespace AlphaCSV;
@@ -140,5 +141,64 @@ public class CSVWriter : ICSVWriter {
         }
         writer.Flush();
         writer.Close();
+    }
+
+    /// <summary>
+    ///     Parses a CSV file containing values for the public set properties of
+    ///     the specified type
+    /// </summary>
+    /// <typeparam name="T">
+    ///     The type that we will receive
+    /// </typeparam>
+    /// <param name="path">
+    ///     The path of the CSV File
+    /// </param>
+    /// <param name="options">
+    ///     CSV Parsing options
+    /// </param>
+    /// <param name="validationPatterns">Validation Patterns</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static string WriteType<T>(T input) {
+        Type genType = typeof(T);
+
+        PropertyInfo[] properties = genType.GetProperties();
+
+
+        List<Type> propertyTypes = [];
+        List<MethodInfo?> propertySetMethods = [];
+        List<string> propertNames = [];
+
+        List<Tuple<Type, MethodInfo>> comprisingTypes = [];
+        foreach (PropertyInfo pi in properties) {
+
+            MethodInfo? getter = pi.GetMethod;
+
+            if (getter is null) {
+                continue;
+            }
+
+            if (!getter.IsPublic) {
+                continue;
+            }
+
+
+            object? val = getter.Invoke(input, parameters: null);
+
+            if (val is null) {
+                continue;
+            }
+
+            propertyTypes.Add(pi.PropertyType);
+            propertySetMethods.Add(pi.GetSetMethod());
+
+            CSVFieldNameAttribute? attr = pi.GetCustomAttribute<CSVFieldNameAttribute>();
+            if (attr is null) {
+                propertNames.Add(pi.Name);
+            } else {
+                propertNames.Add(attr.FieldName);
+            }
+        }
+
     }
 }
