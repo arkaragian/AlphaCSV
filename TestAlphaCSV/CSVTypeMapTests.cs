@@ -1,5 +1,6 @@
 using AlphaCSV;
 using Xunit;
+using System;
 using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
 
@@ -28,6 +29,42 @@ public sealed class CSVTypeMapTests {
         Assert.Equal("Ada", parsed[0].Name);
         Assert.Equal("Athens", parsed[0].Address.City);
         Assert.Equal("Name,Address.City\nAda,Athens\n", CSVWriter.WriteType(parsed, map));
+    }
+
+    [Fact]
+    public void AddField_DuplicateName_Throws() {
+        CSVTypeMap<Customer> map = new(() => new Customer());
+        _ = map.AddField("Name", customer => customer.Name, (customer, value) => customer.Name = value);
+
+        ArgumentException exception = Assert.Throws<ArgumentException>(() => map.AddField("Name", customer => customer.Name, (customer, value) => customer.Name = value));
+
+        Assert.Contains("already mapped", exception.Message);
+    }
+
+    [Fact]
+    public void Constructor_NullFactory_Throws() {
+        Assert.Throws<ArgumentNullException>(() => new CSVTypeMap<Customer>(factory: null!));
+    }
+
+    [Fact]
+    public void AddField_EmptyName_Throws() {
+        CSVTypeMap<Customer> map = new(() => new Customer());
+
+        Assert.Throws<ArgumentException>(() => map.AddField(" ", customer => customer.Name, (customer, value) => customer.Name = value));
+    }
+
+    [Fact]
+    public void AddField_NullGetter_Throws() {
+        CSVTypeMap<Customer> map = new(() => new Customer());
+
+        Assert.Throws<ArgumentNullException>(() => map.AddField<string>("Name", getter: null!, (customer, value) => customer.Name = value));
+    }
+
+    [Fact]
+    public void AddField_NullSetter_Throws() {
+        CSVTypeMap<Customer> map = new(() => new Customer());
+
+        Assert.Throws<ArgumentNullException>(() => map.AddField("Name", customer => customer.Name, setter: null!));
     }
 
     private sealed class Customer {
