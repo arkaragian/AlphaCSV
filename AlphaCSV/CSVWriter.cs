@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
@@ -144,7 +145,7 @@ public class CSVWriter : ICSVWriter {
         writer.Close();
     }
 
-    public static string WriteType<T>(IEnumerable<T> input, CSVWriteOptions? options) {
+    public static string WriteType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(IEnumerable<T> input, CSVWriteOptions? options) {
         options ??= new CSVWriteOptions();
 
         Type genType = typeof(T);
@@ -196,7 +197,7 @@ public class CSVWriter : ICSVWriter {
     /// <param name="validationPatterns">Validation Patterns</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static string WriteTypeLine<T>(T input, CSVWriteOptions? options) {
+    public static string WriteTypeLine<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(T input, CSVWriteOptions? options) {
         options ??= new CSVWriteOptions();
 
         Type genType = typeof(T);
@@ -225,28 +226,54 @@ public class CSVWriter : ICSVWriter {
                 continue;
             }
 
-            string text = val switch {
-                bool b => b ? "true" : "false",
-                DateTime dt => dt.ToString(options.CommonOptions.DateTimeFormat, CultureInfo.InvariantCulture),
-                IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
-                _ => val.ToString() ?? ""
-            };
-
-            //Maybe quote the value
-            if (text.Contains('"')) {
-                text = text.Replace("\"", "\"\"");
-            }
-
-            //Maybe quote the entire field.
-            if (text.Contains(',') || text.Contains('"') || text.Contains('\r') || text.Contains('\n')) {
-                text = $"\"{text}\"";
-            }
-
-            strValues.Add(text);
+            strValues.Add(FormatValue(val, options));
 
         }
 
         return string.Join(",", strValues);
 
+    }
+
+    /// <summary>Writes mapped objects without runtime property discovery.</summary>
+    public static string WriteType<T>(IEnumerable<T> input, CSVTypeMap<T> map, CSVWriteOptions? options = null) {
+        ArgumentNullException.ThrowIfNull(map);
+        StringBuilder builder = new();
+        List<string> names = [];
+        foreach (CSVTypeField<T> field in map.Fields) {
+            names.Add(field.Name);
+        }
+        builder.Append(string.Join(",", names)).Append('\n');
+        foreach (T item in input) {
+            builder.Append(WriteTypeLine(item, map, options)).Append('\n');
+        }
+        return builder.ToString();
+    }
+
+    /// <summary>Writes a mapped object without runtime property discovery.</summary>
+    public static string WriteTypeLine<T>(T input, CSVTypeMap<T> map, CSVWriteOptions? options = null) {
+        ArgumentNullException.ThrowIfNull(map);
+        options ??= new CSVWriteOptions();
+        List<string> values = [];
+        foreach (CSVTypeField<T> field in map.Fields) {
+            values.Add(FormatValue(field.GetValue(input), options));
+        }
+        return string.Join(",", values);
+    }
+
+    private static string FormatValue(object? value, CSVWriteOptions options) {
+        string text = value switch {
+            null => "",
+            bool b => b ? "true" : "false",
+            DateTime dt => dt.ToString(options.CommonOptions.DateTimeFormat, CultureInfo.InvariantCulture),
+            IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
+            _ => value.ToString() ?? ""
+        };
+        if (text.Contains('"')) {
+            text = text.Replace("\"", "\"\"");
+        }
+        if (text.Contains(',') || text.Contains('"') || text.Contains('\r') || text.Contains('\n')) {
+            text = $"\"{text}\"";
+        }
+        return text;
     }
 }

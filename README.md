@@ -140,6 +140,24 @@ PART-001,CUST-42,CUSTOM-ABC
 Nested types must have a public parameterless constructor and public settable properties. The parser creates a nested
 instance when a matching field is encountered. `CSVFieldNameAttribute` values are used for each segment of the path.
 
+#### Native AOT
+
+The reflection-based `ParseType<T>(path)` method cannot guarantee that the trimmer preserves constructors and
+properties of nested types. For Native AOT, define the fields explicitly and pass a `CSVTypeMap<T>`:
+
+```csharp
+CSVTypeMap<Person> map = new CSVTypeMap<Person>(() => new Person())
+    .AddField("Name", person => person.Name, (person, value) => person.Name = value)
+    .AddField("Surname", person => person.Surname, (person, value) => person.Surname = value);
+
+List<Person> persons = parser.ParseType(filepath, map);
+string csv = CSVWriter.WriteType(persons, map);
+```
+
+Mappings can use dot-separated names and getters or setters for nested objects. The supplied factory and delegates
+reference the required model members directly, so the AOT compiler can retain them. The same map can be used with
+`CSVWriter.WriteTypeLine(person, map)`. The reflection-based writer methods remain available for existing callers.
+
 ### Writing custom types with `WriteType<T>`
 
 `CSVWriter.WriteType` serializes an `IEnumerable<T>` to a CSV string. Public readable properties become the header

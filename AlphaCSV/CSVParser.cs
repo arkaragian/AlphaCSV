@@ -7,6 +7,7 @@ using AlphaCSV.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.Linq;
@@ -190,6 +191,7 @@ public class CSVParser : ICSVParser {
     /// <param name="validationPatterns">Validation Patterns</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
+    [RequiresUnreferencedCode("Runtime discovery of nested properties cannot be preserved by the trimmer. Use the CSVTypeMap<T> overload for Native AOT.")]
     public List<T> ParseType<T>(string path, CSVParseOptions? options = null, List<Func<string, bool>>? validationPatterns = null) {
         Type genericType = typeof(T);
         ConstructorInfo? constructor = genericType.GetConstructor([]);
@@ -229,6 +231,32 @@ public class CSVParser : ICSVParser {
 
     }
 
+    /// <summary>Parses a CSV file using an explicit, Native AOT compatible type map.</summary>
+    public List<T> ParseType<T>(string path, CSVTypeMap<T> map, CSVParseOptions? options = null, List<Func<string, bool>>? validationPatterns = null) {
+        ArgumentNullException.ThrowIfNull(map);
+        DataTable table = ParseSimpleCSV(path, options, validationPatterns);
+        if (options is not null && options.EnforceColumnCount && table.Columns.Count != map.Fields.Count) {
+            throw new InvalidOperationException($"The number of parsed columns ({table.Columns.Count}) do not match the number of mapped fields {map.Fields.Count}");
+        }
+
+        Dictionary<string, CSVTypeField<T>> fields = new(StringComparer.Ordinal);
+        foreach (CSVTypeField<T> field in map.Fields) {
+            fields.Add(field.Name, field);
+        }
+
+        List<T> result = new(table.Rows.Count);
+        foreach (DataRow row in table.Rows) {
+            T instance = map.Create();
+            foreach (DataColumn column in table.Columns) {
+                if (fields.TryGetValue(column.ColumnName, out CSVTypeField<T>? field)) {
+                    field.SetValue(instance, PropertyConverter.ConvertValue(row[column], field.ValueType));
+                }
+            }
+            result.Add(instance);
+        }
+        return result;
+    }
+
     /// <summary>
     /// Creates the CSV field bindings for all writable leaf properties of the specified type.
     /// </summary>
@@ -236,6 +264,7 @@ public class CSVParser : ICSVParser {
     /// <returns>
     /// A list of bindings whose names use dot-separated paths for nested properties.
     /// </returns>
+    [RequiresUnreferencedCode("Runtime property discovery is not compatible with trimming.")]
     private static List<PropertyBinding> GetPropertyBindings(Type type) {
         List<PropertyBinding> bindings = [];
         GetPropertyBindings(type, prefix: null, [], bindings, [type]);
@@ -253,6 +282,7 @@ public class CSVParser : ICSVParser {
     /// <exception cref="InvalidOperationException">
     /// Thrown when a nested property introduces a cycle in the object graph.
     /// </exception>
+    [RequiresUnreferencedCode("Runtime property discovery is not compatible with trimming.")]
     private static void GetPropertyBindings(Type type, string? prefix, List<PropertyInfo> propertyPath, List<PropertyBinding> bindings, HashSet<Type> ancestors) {
         foreach (PropertyInfo property in type.GetProperties()) {
             MethodInfo? setMethod = property.GetSetMethod();
@@ -288,6 +318,7 @@ public class CSVParser : ICSVParser {
     /// parameterless constructor and at least one public writable property; otherwise,
     /// <see langword="false"/>.
     /// </returns>
+    [RequiresUnreferencedCode("Runtime property discovery is not compatible with trimming.")]
     private static bool IsNestedType(Type type) {
         return type != typeof(string)
             && type.IsClass

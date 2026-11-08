@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace AlphaCSV.Models;
@@ -20,6 +21,7 @@ public sealed class PropertyBinding(string name, Type propertyType, List<Propert
     /// </summary>
     /// <param name="instance">The root object on which the property path begins.</param>
     /// <param name="value">The converted value to assign to the leaf property.</param>
+    [RequiresUnreferencedCode("Runtime discovery of nested constructors is not compatible with trimming.")]
     public void SetValue(object instance, object? value) {
         object currentInstance = instance;
         for (int i = 0; i < propertyPath.Count; i++) {
