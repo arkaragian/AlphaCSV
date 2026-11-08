@@ -5,7 +5,7 @@
 
 
 using AlphaCSV;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,8 +18,14 @@ namespace TestAlphaCSV {
     /// To do this we have implemented a hierarchy of IEnumerable methods
     /// whose combinations generate a multitude of inputs towards the test methods.
     /// </summary>
-    [TestClass]
     public partial class CSVReaderTests {
+#pragma warning disable CA1707
+
+        private readonly ITestOutputHelper _output;
+
+        public CSVReaderTests(ITestOutputHelper output) {
+            _output = output;
+        }
 
         #region Termination Definitions
         /// <summary>
@@ -302,14 +308,14 @@ namespace TestAlphaCSV {
 
 
 
-        [TestMethod]
-        [DynamicData(nameof(SimpleInputGenerator))]
-        [DynamicData(nameof(QuotedInputGenerator))]
-        [DynamicData(nameof(QuotedSimpleMixInputGenerator))]
-        public void TestSimpleParse(string input, DataTable expectedResult, CSVParseOptions options, TerminationType headerTermination, TerminationType lineTermination) {
+        [Theory]
+        [MemberData(nameof(SimpleInputGenerator), DisableDiscoveryEnumeration = true)]
+        [MemberData(nameof(QuotedInputGenerator), DisableDiscoveryEnumeration = true)]
+        [MemberData(nameof(QuotedSimpleMixInputGenerator), DisableDiscoveryEnumeration = true)]
+        public void ParseSimpleCSV_ValidInput_ReturnsExpectedTable(string input, DataTable expectedResult, CSVParseOptions options, TerminationType headerTermination, TerminationType lineTermination) {
             //Arrange
-            Console.WriteLine($"Input:\n{input}\n");
-            Console.WriteLine($"Header termination: {headerTermination}, Record Termination: {lineTermination}");
+            _output.WriteLine($"Input:\n{input}\n");
+            _output.WriteLine($"Header termination: {headerTermination}, Record Termination: {lineTermination}");
             MockFileSystem fs = new MockFileSystem();
             MockFileData mockInputFile = new MockFileData(input);
             string path = @"C:\test.csv";
@@ -324,21 +330,21 @@ namespace TestAlphaCSV {
             AssertDataTable.AreEqual(expectedResult, table);
         }
 
-        [TestMethod]
-        [DynamicData(nameof(SimpleInputGenerator))]
-        [DynamicData(nameof(QuotedInputGenerator))]
-        [DynamicData(nameof(QuotedSimpleMixInputGenerator))]
-        [DynamicData(nameof(MixedStringIntegersInputGenerator))]
-        public void TestDefinedParse(string input, DataTable expectedResult, CSVParseOptions options, TerminationType headerTermination, TerminationType lineTermination) {
+        [Theory]
+        [MemberData(nameof(SimpleInputGenerator), DisableDiscoveryEnumeration = true)]
+        [MemberData(nameof(QuotedInputGenerator), DisableDiscoveryEnumeration = true)]
+        [MemberData(nameof(QuotedSimpleMixInputGenerator), DisableDiscoveryEnumeration = true)]
+        [MemberData(nameof(MixedStringIntegersInputGenerator), DisableDiscoveryEnumeration = true)]
+        public void ParseDefinedCSV_ValidInput_ReturnsExpectedTable(string input, DataTable expectedResult, CSVParseOptions options, TerminationType headerTermination, TerminationType lineTermination) {
             //Arrange
-            Console.WriteLine($"Input:\n{input}\n");
-            Console.WriteLine($"Header termination: {headerTermination}, Record Termination: {lineTermination}");
+            _output.WriteLine($"Input:\n{input}\n");
+            _output.WriteLine($"Header termination: {headerTermination}, Record Termination: {lineTermination}");
 
-            Console.WriteLine("Schema Definition:");
+            _output.WriteLine("Schema Definition:");
             foreach (DataColumn c in expectedResult.Columns) {
-                Console.Write($"{c.DataType}\t");
+                _output.Write($"{c.DataType}\t");
             }
-            Console.Write("\n");
+            _output.Write("\n");
 
             MockFileSystem fs = new MockFileSystem();
             MockFileData mockInputFile = new MockFileData(input);
@@ -359,7 +365,7 @@ namespace TestAlphaCSV {
 
 #if false
         //This is a single debug method aiming to provide a scrapbook in order to debug a test.
-        [TestMethod]
+        [Fact]
         public void DebugSingleCase() {
             //Arrange
             MockFileSystem fs = new MockFileSystem();
@@ -392,5 +398,6 @@ namespace TestAlphaCSV {
         }
 #endif
 
+#pragma warning restore CA1707
     }
 }

@@ -1,5 +1,5 @@
-﻿using AlphaCSV;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AlphaCSV;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace TestAlphaCSV {
     public partial class CSVReaderTests {
+#pragma warning disable CA1707
 
         public record TestRecord {
             public required string Name { get; set; }
@@ -32,8 +33,8 @@ namespace TestAlphaCSV {
 
 
 
-        [TestMethod]
-        public void TestSimpleClassParsing() {
+        [Fact]
+        public void ParseType_SimpleClass_ReturnsExpectedRecord() {
             string input = "Name,Surname\nJohn,Doe\n";
 
             //Arrange
@@ -56,11 +57,11 @@ namespace TestAlphaCSV {
 
 
             //Assert
-            CollectionAssert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [TestMethod]
-        public void TestSimpleClassParsingReverseColumnOrder() {
+        [Fact]
+        public void ParseType_ReversedColumnOrder_ReturnsExpectedRecord() {
             string input = "Surname,Name\nDoe,John\n";
 
             //Arrange
@@ -83,11 +84,11 @@ namespace TestAlphaCSV {
 
 
             //Assert
-            CollectionAssert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [TestMethod]
-        public void TestDerivedClass() {
+        [Fact]
+        public void ParseType_DerivedClass_ReturnsExpectedRecord() {
             string input = "Name,Surname,FatherName\nJohn,Doe,Donald\n";
 
             //Arrange
@@ -111,11 +112,11 @@ namespace TestAlphaCSV {
 
 
             //Assert
-            CollectionAssert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [TestMethod]
-        public void TestNestedClassParsing() {
+        [Fact]
+        public void ParseType_NestedClass_ReturnsExpectedRecord() {
             string input = "PartNumber,CustomerReference.CustomerID,CustomerReference.CustomerPartNumber,CustomerReference.CustomerPartDescription\nPART-001,CUST-42,CUSTOM-ABC,Replacement filter\n";
 
             MockFileSystem fs = new MockFileSystem();
@@ -138,7 +139,8 @@ namespace TestAlphaCSV {
             };
             List<CustomerPartCrossReference> actual = parser.ParseType<CustomerPartCrossReference>(path, options);
 
-            CollectionAssert.AreEqual(new List<CustomerPartCrossReference> { expected }, actual);
+            Assert.Equal(new List<CustomerPartCrossReference> { expected }, actual);
         }
+#pragma warning restore CA1707
     }
 }

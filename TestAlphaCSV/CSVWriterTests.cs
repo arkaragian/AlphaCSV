@@ -1,18 +1,24 @@
-﻿//
+//
 // Copyright (c) Aris Karagiannidis and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 
 using AlphaCSV;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Data;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
 
 namespace TestAlphaCSV {
-    [TestClass]
     public class CSVWriterTests {
+#pragma warning disable CA1707
+
+        private readonly ITestOutputHelper _output;
+
+        public CSVWriterTests(ITestOutputHelper output) {
+            _output = output;
+        }
 
         /// <summary>
         /// Retuns a DataTable of strings with the given size.
@@ -118,8 +124,8 @@ namespace TestAlphaCSV {
             return table;
         }
 
-        [TestMethod]
-        public void TestWritenFileExists() {
+        [Fact]
+        public void WriteCSV_ValidInput_CreatesFile() {
             //Arrange
             DataTable table = GetSimpleTable();
             MockFileSystem fileSystem = new MockFileSystem();
@@ -130,11 +136,11 @@ namespace TestAlphaCSV {
 
             //Assert
             bool exist = fileSystem.File.Exists("test.csv");
-            Assert.IsTrue(exist);
+            Assert.True(exist);
         }
 
-        [TestMethod]
-        public void TestWrittenNumberOfLines() {
+        [Fact]
+        public void WriteCSV_ValidInput_WritesExpectedLineCount() {
             //Arrange
             DataTable table = GetSimpleTable();
 
@@ -148,11 +154,11 @@ namespace TestAlphaCSV {
 
             //Assert
             string[] readLines = fileSystem.File.ReadAllLines("test.csv");
-            Assert.AreEqual(totalLines, readLines.Length);
+            Assert.Equal(totalLines, readLines.Length);
         }
 
-        [TestMethod]
-        public void TestWrittenContent() {
+        [Fact]
+        public void WriteCSV_ValidInput_WritesExpectedContent() {
             //Arrange
             DataTable table = GetSimpleTable();
             MockFileSystem fileSystem = new MockFileSystem();
@@ -168,11 +174,11 @@ namespace TestAlphaCSV {
 
             //Assert
             string[] readLines = fileSystem.File.ReadAllLines("test.csv");
-            CollectionAssert.AreEqual(expectedLines, readLines);
+            Assert.Equal(expectedLines, readLines);
         }
 
-        [TestMethod]
-        public void TestWrittenContentWithQuotes() {
+        [Fact]
+        public void WriteCSV_QuotedInput_WritesExpectedContent() {
             //Arrange
             DataTable table = GetSimpleTable();
             MockFileSystem fileSystem = new MockFileSystem();
@@ -190,11 +196,11 @@ namespace TestAlphaCSV {
 
             //Assert2
             string[] readLines = fileSystem.File.ReadAllLines("test.csv");
-            CollectionAssert.AreEqual(expectedLines, readLines);
+            Assert.Equal(expectedLines, readLines);
         }
 
-        [TestMethod]
-        public void TestNumberOfBytes() {
+        [Fact]
+        public void WriteCSV_ValidInput_WritesExpectedByteCount() {
             //Arrange
             DataTable table = GetSimpleTable();
             MockFileSystem fileSystem = new MockFileSystem();
@@ -211,10 +217,10 @@ namespace TestAlphaCSV {
 
             //Assert
             byte[] readBytes = fileSystem.File.ReadAllBytes("test.csv");
-            Assert.AreEqual(45, readBytes.Length);
+            Assert.Equal(45, readBytes.Length);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteCSV_WriteQuotedFieldThatContainsQuotes_ShouldEscapeTheQuote() {
             //Arrange
 
@@ -254,10 +260,10 @@ namespace TestAlphaCSV {
             //for(int i=0; i<readLines.Length; i++){
             //    Console.WriteLine("Comparing {0} with {1}",readLines[i],expectedLines[i]);
             //}
-            CollectionAssert.AreEqual(expectedLines, readLines);
+            Assert.Equal(expectedLines, readLines);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteCSV_WriteUnquotedFieldThatContainsQuotes_ShouldEscapeTheQuote() {
             //Arrange
 
@@ -295,10 +301,10 @@ namespace TestAlphaCSV {
             //for(int i=0; i<readLines.Length; i++){
             //    Console.WriteLine("Comparing {0} with {1}",readLines[i],expectedLines[i]);
             //}
-            CollectionAssert.AreEqual(expectedLines, readLines);
+            Assert.Equal(expectedLines, readLines);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteCSV_WriteFieldThatContainsBothDelimeterAndQuotes_ShouldEscapeTheQuote() {
             //Arrange
 
@@ -336,10 +342,11 @@ namespace TestAlphaCSV {
             //for(int i=0; i<readLines.Length; i++){
             //    Console.WriteLine("Comparing {0} with {1}",readLines[i],expectedLines[i]);
             //}
-            CollectionAssert.AreEqual(expectedLines, readLines);
+            Assert.Equal(expectedLines, readLines);
         }
 
 
 
+#pragma warning restore CA1707
     }
 }

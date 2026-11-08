@@ -1,21 +1,26 @@
-﻿//
+//
 // Copyright (c) Aris Karagiannidis and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for details.
 //
 
 using AlphaCSV;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO.Abstractions.TestingHelpers;
 
 namespace TestAlphaCSV {
-    [TestClass]
     public sealed class CSVWriterTypeTests {
 #pragma warning disable CA1707
 
-        [TestMethod]
+        private readonly ITestOutputHelper _output;
+
+        public CSVWriterTypeTests(ITestOutputHelper output) {
+            _output = output;
+        }
+
+        [Fact]
         public void WriteType_ObjectsHavePublicReadableProperties_WritesHeaderAndRows() {
             // Arrange
             WritableModel[] input = {
@@ -27,10 +32,10 @@ namespace TestAlphaCSV {
             string result = CSVWriter.WriteType(input, options: null);
 
             // Assert
-            Assert.AreEqual("Name,Count\nAlpha,1\n\"Beta, \"\"quoted\"\"\",2\n", result);
+            Assert.Equal("Name,Count\nAlpha,1\n\"Beta, \"\"quoted\"\"\",2\n", result);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteType_SequenceIsEmpty_WritesHeaderOnly() {
             // Arrange
             WritableModel[] input = Array.Empty<WritableModel>();
@@ -39,10 +44,10 @@ namespace TestAlphaCSV {
             string result = CSVWriter.WriteType(input, options: null);
 
             // Assert
-            Assert.AreEqual("Name,Count\n", result);
+            Assert.Equal("Name,Count\n", result);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteType_OutputIsParsedAgain_PreservesObjects() {
             // Arrange
             List<RoundTripModel> expected = new() {
@@ -74,10 +79,10 @@ namespace TestAlphaCSV {
             List<RoundTripModel> actual = reader.ParseType<RoundTripModel>(ROUND_TRIP_PATH, parseOptions);
 
             // Assert
-            CollectionAssert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteTypeLine_OutputIsParsedAgain_PreservesObject() {
             // Arrange
             RoundTripModel expected = new() {
@@ -100,11 +105,11 @@ namespace TestAlphaCSV {
             List<RoundTripModel> actual = reader.ParseType<RoundTripModel>(ROUND_TRIP_PATH, parseOptions);
 
             // Assert
-            Assert.HasCount(1, actual);
-            Assert.AreEqual(expected, actual[0]);
+            Assert.Single(actual);
+            Assert.Equal(expected, actual[0]);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteTypeLine_ValuesNeedFormatting_UsesConfiguredAndInvariantFormats() {
             // Arrange
             CSVWriteOptions options = new CSVWriteOptions() {
@@ -127,17 +132,17 @@ namespace TestAlphaCSV {
                 string result = CSVWriter.WriteTypeLine(input, options);
 
                 // Assert
-                Assert.AreEqual(",false,2024/02/03 04:05,1234.5", result);
+                Assert.Equal(",false,2024/02/03 04:05,1234.5", result);
             } finally {
                 CultureInfo.CurrentCulture = originalCulture;
             }
         }
 
-        [TestMethod]
-        [DataRow("Alpha,Beta", "\"Alpha,Beta\"")]
-        [DataRow("Alpha \"Beta\"", "\"Alpha \"\"Beta\"\"\"")]
-        [DataRow("Alpha\rBeta", "\"Alpha\rBeta\"")]
-        [DataRow("Alpha\nBeta", "\"Alpha\nBeta\"")]
+        [Theory]
+        [InlineData("Alpha,Beta", "\"Alpha,Beta\"")]
+        [InlineData("Alpha \"Beta\"", "\"Alpha \"\"Beta\"\"\"")]
+        [InlineData("Alpha\rBeta", "\"Alpha\rBeta\"")]
+        [InlineData("Alpha\nBeta", "\"Alpha\nBeta\"")]
         public void WriteTypeLine_FieldContainsCsvSpecialCharacter_QuotesAndEscapesField(string value, string expected) {
             // Arrange
             EscapedModel input = new EscapedModel() {
@@ -148,7 +153,7 @@ namespace TestAlphaCSV {
             string result = CSVWriter.WriteTypeLine(input, options: null);
 
             // Assert
-            Assert.AreEqual(expected, result);
+            Assert.Equal(expected, result);
         }
 
         private sealed class WritableModel {

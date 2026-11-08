@@ -1,13 +1,19 @@
-﻿using AlphaCSV;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AlphaCSV;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO.Abstractions.TestingHelpers;
 
 namespace TestAlphaCSV {
-    [TestClass]
     public class CSVReaderValidatorsTest {
+#pragma warning disable CA1707
+
+        private readonly ITestOutputHelper _output;
+
+        public CSVReaderValidatorsTest(ITestOutputHelper output) {
+            _output = output;
+        }
 
         private DataTable expectedData {
             get {
@@ -54,8 +60,8 @@ namespace TestAlphaCSV {
 
 
 
-        [TestMethod]
-        public void ParseWithValidators() {
+        [Fact]
+        public void ParseDefinedCSV_ValidFieldsWithValidators_ReturnsExpectedTable() {
             MockFileSystem mockfs = new();
             Func<string, bool> Validatora = StringValidatorAlwaysReturnTrue;
             Func<string, bool> Validatorb = IntValidatorCheckIfStringContainsOne;
@@ -75,7 +81,7 @@ namespace TestAlphaCSV {
         }
 
 
-        [TestMethod]
+        [Fact]
         public void ParseDefinedCSV_FieldFailsValidation_ThrowsInvalidOperationException() {
             MockFileSystem mockfs = new();
             Func<string, bool> Validatora = StringValidatorAlwaysReturnTrue;
@@ -92,9 +98,10 @@ namespace TestAlphaCSV {
                 ValidateFields = true
             };
 
-            _ = Assert.ThrowsExactly<InvalidOperationException>(() => {
+            _ = Assert.Throws<InvalidOperationException>(() => {
                 parser.ParseDefinedCSV(expectedData.Clone(), "test.csv", options, validators);
             });
         }
+#pragma warning restore CA1707
     }
 }
